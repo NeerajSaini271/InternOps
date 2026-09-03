@@ -14,6 +14,11 @@ class RateLimiter:
         self.requests_per_minute = requests_per_minute
         self._hits: dict[str, list[float]] = {}
 
+    @property
+    def history(self) -> dict[str, list[float]]:
+        """Backward-compatible alias for the internal per-client hit log."""
+        return self._hits
+
     async def check_rate_limit(
         self,
         request: Request,
@@ -74,4 +79,5 @@ class RateLimiter:
 
 
 ai_rate_limiter = RateLimiter()
-chat_rate_limiter = RateLimiter()
+# Backward-compatible alias so chat and other AI operations share the same limiter instance
+chat_rate_limiter = ai_rate_limiter

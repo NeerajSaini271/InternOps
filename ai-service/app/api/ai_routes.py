@@ -194,14 +194,26 @@ async def chat(
 # ---------------------------------------------------------------------------
 @router.post(
     "/generate",
-    summary="Generate text with sanitized prompt",
+    summary="Generate text from a prompt or a structured conversation history",
     response_model=ProviderResult,
 )
 async def generate_text(request: GenerationRequest):
-    content, provider_name = await ai_orchestrator.generate_text_with_fallback(
-        request.prompt,
-        temperature=request.temperature,
-    )
+    if request.messages:
+        # Preserve role/content structure instead of flattening the
+        # conversation into a single prompt string.
+        conversation = [
+            {"role": msg.role.value, "content": msg.content}
+            for msg in request.messages
+        ]
+        content, provider_name = await ai_orchestrator.generate_chat_with_fallback(
+            conversation,
+            temperature=request.temperature,
+        )
+    else:
+        content, provider_name = await ai_orchestrator.generate_text_with_fallback(
+            request.prompt,
+            temperature=request.temperature,
+        )
     return ProviderResult(
         provider=provider_name,
         cached=False,
@@ -214,7 +226,7 @@ async def generate_text(request: GenerationRequest):
     "/generate-image",
     summary="Generate an image from an assignment topic description",
     response_model=ImageGenerationResponse,
-    dependencies=[Depends(require_roles("ADMIN", "SENIOR_TL", "TL"))],
+    dependencies=[Depends(require_permission("AI_IMAGE_GENERATION"))],
 )
 async def generate_image(
     body: ImageGenerationRequest,

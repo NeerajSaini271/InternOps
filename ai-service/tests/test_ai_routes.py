@@ -108,28 +108,108 @@ def test_chat_happy_path_with_mocked_provider(client, monkeypatch):
     assert body == {"provider": "fake-provider", "cached": False, "content": "hi there!"}
 
 
-def test_messages_to_prompt_flattens_roles():
-    from app.api.ai_routes import _messages_to_prompt
+def test_generate_requires_prompt_or_messages(client):
+    r = client.post("/ai/generate", json={})
+    assert r.status_code == 422  # pydantic model_validator raises ValueError
 
-    prompt = _messages_to_prompt(
-        [
-            {"role": "system", "content": "Be concise."},
-            {"role": "user", "content": "Hi"},
-        ]
+
+def test_generate_rejects_invalid_role(client):
+    r = client.post(
+        "/ai/generate", json={"messages": [{"role": "bogus", "content": "hi"}]}
     )
-    assert prompt == "System: Be concise.\n\nUser: Hi"
+    assert r.status_code == 422  # pydantic enum validation
+
+
+def test_generate_preserves_structured_messages(client, monkeypatch):
+    import app.api.ai_routes as ai_routes_module
+
+    captured = {}
+
+    async def fake_generate_chat(messages, temperature=0.7, **kwargs):
+        captured["messages"] = messages
+        captured["temperature"] = temperature
+        return "structured reply", "fake-provider"
+
+    monkeypatch.setattr(
+        ai_routes_module.ai_orchestrator,
+        "generate_chat_with_fallback",
+        fake_generate_chat,
+    )
+
+    r = client.post(
+        "/ai/generate",
+        json={
+            "messages": [
+                {"role": "system", "content": "Be concise."},
+                {"role": "user", "content": "Hi"},
+                {"role": "assistant", "content": "Hello!"},
+                {"role": "user", "content": "How are you?"},
+            ],
+            "temperature": 0.3,
+        },
+    )
+
+    assert r.status_code == 200
+    body = r.json()
+    assert body == {
+        "provider": "fake-provider",
+        "cached": False,
+        "content": "structured reply",
+    }
+
+    assert captured["messages"] == [
+        {"role": "system", "content": "Be concise."},
+        {"role": "user", "content": "Hi"},
+        {"role": "assistant", "content": "Hello!"},
+        {"role": "user", "content": "How are you?"},
+    ]
+    assert captured["temperature"] == 0.3
+  
+def test_generate_falls_back_to_flat_prompt(client, monkeypatch):
+    import app.api.ai_routes as ai_routes_module
+
+    captured = {}
+
+    async def fake_generate_text(prompt, temperature=0.7, **kwargs):
+        captured["prompt"] = prompt
+        captured["temperature"] = temperature
+        return "flattened reply", "fake-provider"
+
+    monkeypatch.setattr(
+        ai_routes_module.ai_orchestrator,
+        "generate_text_with_fallback",
+        fake_generate_text,
+    )
+
+    r = client.post("/ai/generate", json={"prompt": "hello"})
+
+    assert r.status_code == 200
+    assert r.json()["content"] == "flattened reply"
+    assert r.json()["provider"] == "fake-provider"
+    assert captured["prompt"] == "hello"
+    assert captured["temperature"] == 0.7
 
 
 def test_health_endpoint(client, monkeypatch):
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    for key in [
+        "GEMINI_API_KEY",
+        "OPENAI_API_KEY",
+        "GROQ_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "DEEPSEEK_API_KEY",
+        "HUGGINGFACE_TOKEN",
+        "NVIDIA_API_KEY",
+    ]:
+        monkeypatch.delenv(key, raising=False)
     r = client.get("/ai/health")
     assert r.status_code == 200
     body = r.json()
     names = {p["name"] for p in body["providers"]}
     assert {"gemini", "openai"}.issubset(names)
-    assert all(p["status"] == "unhealthy" for p in body["providers"])
+    provider_status = {p["name"]: p["status"] for p in body["providers"]}
 
+    assert provider_status["gemini"] == "unhealthy"
+    assert provider_status["openai"] == "unhealthy"
 
 def test_health_endpoint_reports_healthy_when_key_present(client, monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")
@@ -211,14 +291,14 @@ def test_chat_uses_cache_for_identical_requests(client, monkeypatch):
 
     calls = 0
 
-    async def fake_generate(prompt, temperature=0.7, **kwargs):
+    async def fake_generate(messages, temperature=0.7, **kwargs):
         nonlocal calls
         calls += 1
         return "cached response", "fake-provider"
 
     monkeypatch.setattr(
         ai_routes_module.ai_orchestrator,
-        "generate_text_with_fallback",
+        "generate_chat_with_fallback",
         fake_generate,
     )
 
