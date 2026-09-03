@@ -203,15 +203,25 @@ def test_generate_falls_back_to_flat_prompt(client, monkeypatch):
 
 
 def test_health_endpoint(client, monkeypatch):
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    for key in [
+        "GEMINI_API_KEY",
+        "OPENAI_API_KEY",
+        "GROQ_API_KEY",
+        "ANTHROPIC_API_KEY",
+        "DEEPSEEK_API_KEY",
+        "HUGGINGFACE_TOKEN",
+        "NVIDIA_API_KEY",
+    ]:
+        monkeypatch.delenv(key, raising=False)
     r = client.get("/ai/health")
     assert r.status_code == 200
     body = r.json()
     names = {p["name"] for p in body["providers"]}
     assert {"gemini", "openai"}.issubset(names)
-    assert all(p["status"] == "unhealthy" for p in body["providers"])
+    provider_status = {p["name"]: p["status"] for p in body["providers"]}
 
+    assert provider_status["gemini"] == "unhealthy"
+    assert provider_status["openai"] == "unhealthy"
 
 def test_health_endpoint_reports_healthy_when_key_present(client, monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")

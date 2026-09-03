@@ -1,4 +1,5 @@
 const noticesRoutes = require('./modules/notices/routes');
+const clientErrorRoutes = require('./modules/client-errors/routes');
 
 // ---------------------------------------------------------------------------
 // Deprecation header hook
@@ -36,6 +37,7 @@ module.exports = async function routes(fastify, opts) {
 
   fastify.register(require('./modules/auth/routes'), { prefix: '/auth' });
   fastify.register(require('./modules/users/routes'), { prefix: '/users' });
+  fastify.register(clientErrorRoutes, { prefix: '/client-error' });
   fastify.register(require('./modules/departments/routes'), {
     prefix: '/departments',
   });
@@ -108,6 +110,10 @@ module.exports = async function routes(fastify, opts) {
 
   fastify.register(require('./modules/github-sync/index'), {
     prefix: '/github',
+  });
+
+  fastify.register(require('./modules/internops/routes'), {
+    prefix: '/internops',
   });
 
   // Public certificate verification (no auth)
