@@ -16,7 +16,7 @@ const { verifyEmail, sendVerificationEmail } = require('./verificationService');
 const repo = require('./repository');
 const { forgotPassword, resetPassword } = require('./resetService');
 const { toSchema } = require('../../utils/schemaHelper');
-const isProduction = process.env.NODE_ENV === 'production';
+const config = require('../../config');
 const isTestEnv = process.env.NODE_ENV === 'test';
 const pLimit = require('p-limit');
 
@@ -217,8 +217,7 @@ async function routes(fastify) {
       const result = await service.login(email, password, req.ip, userAgent);
       reply.setCookie('refreshToken', result.refreshToken, {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
+        ...config.cookie,
         path: '/api/v1/auth/refresh',
       });
 
@@ -263,15 +262,25 @@ async function routes(fastify) {
       const token = req.cookies.refreshToken;
 
       if (!token) {
-        return reply.status(400).send({ error: 'Refresh token required' });
+        req.log.warn(
+          {
+            origin: req.headers.origin || null,
+            hasCookieHeader: Boolean(req.headers.cookie),
+            cookieNames: Object.keys(req.cookies || {}),
+          },
+          'Authentication refresh cookie was not received'
+        );
+        return reply.status(401).send({
+          error: 'Session expired. Please log in again.',
+          code: 'REFRESH_COOKIE_MISSING',
+        });
       }
 
       const tokens = await service.refreshTokens(token, req.ip);
 
       reply.setCookie('refreshToken', tokens.refreshToken, {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'lax',
+        ...config.cookie,
         path: '/api/v1/auth/refresh',
       });
 
@@ -314,7 +323,10 @@ async function routes(fastify) {
         req.headers['user-agent']
       );
 
-      reply.clearCookie('refreshToken', { path: '/api/v1/auth/refresh' });
+      reply.clearCookie('refreshToken', {
+        ...config.cookie,
+        path: '/api/v1/auth/refresh',
+      });
 
       rotateAndSetCsrf(req, reply, null);
       return { message: 'Logged out' };

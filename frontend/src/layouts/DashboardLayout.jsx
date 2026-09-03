@@ -33,7 +33,16 @@ import {
   PanelLeftOpen,
 } from 'lucide-react';
 
-import { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+  useCallback,
+  memo,
+  Suspense,
+} from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
@@ -45,6 +54,7 @@ import useFeatureFlagsStore from '../store/featureFlags';
 import { QUERY_KEYS } from '../constants/queryKeys';
 import { ROLE_LABEL } from '../constants/roles';
 import FloatingChatbot from '../components/FloatingChatbot';
+import RouteRefreshSkeleton from '../components/loading/RouteRefreshSkeleton';
 
 const MANAGER_ROLES = ['ADMIN', 'SENIOR_TL', 'TL', 'CAPTAIN'];
 const ADMIN_AND_SENIOR_TL_ROLES = ['ADMIN', 'SENIOR_TL'];
@@ -201,14 +211,15 @@ const adminNav = [
 const FULL_LOGO_SRC = '/UptoSkills.webp';
 const MINI_LOGO_SRC = '/Uptoskills_log_fevicon.png';
 
-function canShowNavItem(item, role, flags) {
+function canShowNavItem(item, role, flags, flagsLoaded) {
   if (item.excludedRoles && item.excludedRoles.includes(role)) return false;
   if (!item.allowedRoles) {
-    if (item.featureFlag) return flags[item.featureFlag] === true;
+    if (item.featureFlag)
+      return !flagsLoaded || flags[item.featureFlag] === true;
     return true;
   }
   if (!item.allowedRoles.includes(role)) return false;
-  if (item.featureFlag) return flags[item.featureFlag] === true;
+  if (item.featureFlag) return !flagsLoaded || flags[item.featureFlag] === true;
   return true;
 }
 
@@ -245,6 +256,8 @@ NavLink.displayName = 'NavLink';
 export default function DashboardLayout() {
   const loc = useLocation();
   const navigate = useNavigate();
+  const previousPathRef = useRef(loc.pathname);
+  const [animatedPath, setAnimatedPath] = useState(null);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const accessToken = useAuthStore((s) => s.accessToken);
@@ -279,6 +292,7 @@ export default function DashboardLayout() {
 
   const role = user?.role;
   const flags = useFeatureFlagsStore((s) => s.flags);
+  const flagsLoaded = useFeatureFlagsStore((s) => s.loaded);
   const SIDEBAR_KEY = 'sidebar_scroll';
   const sidebarNavRef = useRef(null);
 
@@ -294,12 +308,14 @@ export default function DashboardLayout() {
   const { data: me } = useQuery({
     queryKey: QUERY_KEYS.USER_PROFILE,
     queryFn: () => api.get('/users/me').then((r) => r.data),
+    enabled: !!accessToken,
   });
   const isDepartmentScopedRole = ['SENIOR_TL', 'TL'].includes(role);
   const { data: scopedDepartments = [] } = useQuery({
     queryKey: ['departments', 'sidebar', role],
     queryFn: () => api.get('/departments').then((r) => r.data || []),
-    enabled: isDepartmentScopedRole && !user?.mustChangePassword,
+    enabled:
+      !!accessToken && isDepartmentScopedRole && !user?.mustChangePassword,
   });
   const assignedDepartment = scopedDepartments[0] || null;
   const departmentLabelStorageKey = user?.id
@@ -323,12 +339,13 @@ export default function DashboardLayout() {
     queryFn: () => api.get('/notifications/unread-count').then((r) => r.data),
     refetchInterval: 30000,
     refetchIntervalInBackground: false,
-    enabled: !!user && !user?.mustChangePassword,
+    enabled: !!accessToken && !!user && !user?.mustChangePassword,
   });
 
   const unreadCount = unreadData?.unread || 0;
 
-  const displayName = me?.full_name || user?.fullName || user?.email;
+  const displayName = me?.full_name || user?.full_name || user?.fullName || '';
+  const displayNameReady = Boolean(displayName);
   const avatarUrl = resolveUploadUrl(
     me?.avatar_url || (role === 'ADMIN' ? '/admin-default-avatar.svg' : null)
   );
@@ -343,14 +360,14 @@ export default function DashboardLayout() {
   }, [dark]);
 
   const visibleNav = useMemo(
-    () => nav.filter((item) => canShowNavItem(item, role, flags)),
-    [role, flags]
+    () => nav.filter((item) => canShowNavItem(item, role, flags, flagsLoaded)),
+    [role, flags, flagsLoaded]
   );
 
   const visibleAdminNav = useMemo(
     () =>
       adminNav
-        .filter((item) => canShowNavItem(item, role, flags))
+        .filter((item) => canShowNavItem(item, role, flags, flagsLoaded))
         .map((item) => {
           if (item.path !== '/departments' || !isDepartmentScopedRole) {
             return item;
@@ -369,6 +386,7 @@ export default function DashboardLayout() {
     [
       assignedDepartment,
       flags,
+      flagsLoaded,
       isDepartmentScopedRole,
       role,
       storedDepartmentLabel,
@@ -442,6 +460,13 @@ export default function DashboardLayout() {
     logout();
     navigate('/login');
   };
+
+  useLayoutEffect(() => {
+    if (previousPathRef.current !== loc.pathname) {
+      previousPathRef.current = loc.pathname;
+      setAnimatedPath(loc.pathname);
+    }
+  }, [loc.pathname]);
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/60 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 text-slate-900 dark:text-white">
@@ -606,9 +631,16 @@ export default function DashboardLayout() {
             {!collapsed && (
               <>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-extrabold truncate">
-                    {displayName}
-                  </p>
+                  {displayNameReady ? (
+                    <p className="text-sm font-extrabold truncate">
+                      {displayName}
+                    </p>
+                  ) : (
+                    <span
+                      aria-label="Loading account name"
+                      className="block h-4 w-28 max-w-full animate-pulse rounded-lg bg-white/20"
+                    />
+                  )}
                   <p className="text-[11px] text-indigo-200 truncate">
                     {ROLE_LABEL[role] || role}
                   </p>
@@ -713,7 +745,16 @@ export default function DashboardLayout() {
           </div>
         </header>
         <main className="flex-1 overflow-auto p-5 sm:p-6">
-          <Outlet />
+          <Suspense fallback={<RouteRefreshSkeleton />}>
+            <div
+              key={loc.pathname}
+              className={
+                animatedPath === loc.pathname ? 'animate-fade-in-up' : undefined
+              }
+            >
+              <Outlet />
+            </div>
+          </Suspense>
         </main>
       </div>
 

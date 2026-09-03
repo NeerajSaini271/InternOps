@@ -76,6 +76,8 @@ function initials(u) {
 }
 
 export default function AdminDashboard() {
+  const hydrated = useAuthStore((s) => s.hydrated);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const currentUser = useAuthStore((state) => state.user);
   const isAdmin = currentUser?.role === 'ADMIN';
   const queryClient = useQueryClient();
@@ -111,7 +113,7 @@ export default function AdminDashboard() {
   const { data: departments = [] } = useQuery({
     queryKey: ['departments'],
     queryFn: () => api.get('/departments').then((res) => res.data || []),
-    enabled: isAdmin,
+    enabled: hydrated && !!accessToken && isAdmin,
   });
   const departmentOptions = [
     { value: '', label: 'All departments' },
@@ -225,7 +227,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto animate-fade-in-up">
+    <div className="max-w-7xl mx-auto">
       {/* Professional Header Block */}
       <div className="mb-7 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
         <div className="flex items-center gap-4">

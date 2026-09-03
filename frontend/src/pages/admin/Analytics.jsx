@@ -9,6 +9,7 @@ import {
   Filter,
   Users,
 } from 'lucide-react';
+import useAuthStore from '../../store/auth';
 import api from '../../lib/axios';
 import { Card, Table, Badge, Spinner } from '../../components/ui';
 import CustomSelect from '../../components/CustomSelect';
@@ -60,6 +61,8 @@ function getMonthOptions(selectedYear) {
 }
 
 export default function Analytics() {
+  const hydrated = useAuthStore((s) => s.hydrated);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const [deptId, setDeptId] = useState('');
   const [month, setMonth] = useState(String(new Date().getMonth() + 1));
   const [year, setYear] = useState(String(new Date().getFullYear()));
@@ -67,6 +70,7 @@ export default function Analytics() {
     queryKey: ['analyticsOverview'],
     queryFn: () =>
       api.get('/analytics/overview').then((response) => response.data),
+    enabled: hydrated && !!accessToken,
   });
 
   const yearOptions = getYearOptions();
@@ -87,6 +91,7 @@ export default function Analytics() {
     queryKey: ['departmentsList'],
     queryFn: () => api.get('/departments').then((r) => r.data),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: hydrated && !!accessToken,
   });
 
   const departmentOptions = [
@@ -111,7 +116,7 @@ export default function Analytics() {
           `/analytics/department-attendance?departmentId=${deptId}&month=${month}&year=${year}`
         )
         .then((r) => r.data),
-    enabled: isValidUuid,
+    enabled: hydrated && !!accessToken && isValidUuid,
   });
 
   const {
@@ -124,6 +129,7 @@ export default function Analytics() {
       api
         .get('/analytics/top-performers?role=INTERN&limit=5')
         .then((r) => r.data),
+    enabled: hydrated && !!accessToken,
   });
 
   const {
@@ -134,6 +140,7 @@ export default function Analytics() {
     queryKey: ['attendanceTrends'],
     queryFn: () =>
       api.get('/analytics/attendance-trends?months=6').then((r) => r.data),
+    enabled: hydrated && !!accessToken,
   });
 
   const roleCounts = overview?.users || [];
@@ -159,7 +166,7 @@ export default function Analytics() {
     : [];
 
   return (
-    <div className="animate-fade-in-up">
+    <div className="">
       {/* Professional Header Block */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
         <div className="flex items-center gap-4">

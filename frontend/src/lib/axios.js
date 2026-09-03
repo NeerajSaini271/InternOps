@@ -193,7 +193,6 @@ let _authStore = null;
 
 export function registerAuthStore(store) {
   _authStore = store;
-  removeLegacyAuthStorage();
 }
 
 function getMemoryAccessToken() {
@@ -326,7 +325,6 @@ api.interceptors.response.use(
           // The server rotated the refresh cookie. The CSRF token may also
           // have changed, so reset it so the next request picks up a fresh one.
           clearCsrfToken();
-          removeLegacyAuthStorage();
 
           processQueue(null, newToken);
 

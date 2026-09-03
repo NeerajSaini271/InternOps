@@ -1,4 +1,10 @@
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
 import DashboardLayout from './layouts/DashboardLayout';
 import useAuthStore from './store/auth';
@@ -7,12 +13,13 @@ import api from './lib/axios';
 import RoleGuard from './components/RoleGuard';
 import ErrorBoundary from './components/ErrorBoundary';
 import HR from './pages/HR';
+import Dashboard from './pages/Dashboard';
+import RouteRefreshSkeleton from './components/loading/RouteRefreshSkeleton';
 
 // Lazy load page components
 const Login = lazy(() => import('./pages/Login'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Tasks = lazy(() => import('./pages/Tasks'));
 const Attendance = lazy(() => import('./pages/Attendance'));
 const Ratings = lazy(() => import('./pages/Ratings'));
@@ -46,26 +53,23 @@ const ProjectDetailPage = lazy(() => import('./pages/admin/ProjectDetailPage'));
 const TaskDetails = lazy(() => import('./pages/admin/TaskDetails'));
 
 function PageLoader() {
-  return (
-    <div className="flex items-center justify-center min-h-[50vh] w-full">
-      <div
-        className="h-12 w-12 animate-spin rounded-full border-4 border-slate-300 border-t-indigo-600 dark:border-slate-700 dark:border-t-indigo-400"
-        role="status"
-        aria-label="Loading"
-      />
-    </div>
-  );
+  return <RouteRefreshSkeleton />;
 }
 
 let bootRefreshPromise = null;
 
 function Private({ children }) {
+  const location = useLocation();
   const token = useAuthStore((s) => s.accessToken);
   const user = useAuthStore((s) => s.user);
   const hydrated = useAuthStore((s) => s.hydrated);
 
-  if (!hydrated) return null;
-  if (!token) return <Navigate to="/login" replace />;
+  if (!hydrated) {
+    return user ? children : null;
+  }
+  if (!token) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
   if (user?.mustChangePassword && window.location.pathname !== '/profile') {
     return <Navigate to="/profile" replace />;
   }
@@ -107,7 +111,9 @@ export default function App() {
         if (refreshedUser?.mustChangePassword) {
           resetFlags();
         } else {
-          await fetchFlags();
+          Promise.resolve(fetchFlags()).catch(() => {
+            // Feature flags use their own safe defaults and must not block boot.
+          });
         }
         return res;
       });
@@ -164,7 +170,7 @@ export default function App() {
     );
   }
 
-  if (!hydrated) {
+  if (!hydrated && !useAuthStore.getState().user) {
     return (
       <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 dark:from-slate-950 dark:via-indigo-950 dark:to-blue-950 text-slate-800 dark:text-white overflow-hidden animate-fade-in">
         {/* Background Decor Grid */}
@@ -274,7 +280,6 @@ export default function App() {
               }
             />
 
-            <Route path="profile" element={<Profile />} />
             <Route path="profile" element={<Profile />} />
             <Route path="sessions" element={<Sessions />} />
             <Route path="notifications" element={<Notifications />} />
