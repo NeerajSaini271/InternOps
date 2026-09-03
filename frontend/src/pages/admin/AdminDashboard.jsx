@@ -23,8 +23,7 @@ import EditUserModal from '../../components/admin/EditUserModal';
 import DeleteUserModal from '../../components/admin/DeleteUserModal';
 import CustomSelect from '../../components/CustomSelect';
 import BulkUserModal from '../../components/admin/BulkUserModal';
-import WorkbookImportModal from '../../components/admin/WorkbookImportModal';
-import { ROLE_LABEL } from '../../constants/roles';
+import InternStatCards from '../../components/admin/InternStatCards';
 
 const ROLE_COLOR = {
   ADMIN:
@@ -235,16 +234,12 @@ export default function AdminDashboard() {
           </div>
 
           <div>
-            <p className="text-xs md:text-sm uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-300 font-extrabold mb-1">
-              Admin Panel
-            </p>
-
             <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              User Directory
+              Welcome, System Admin
             </h1>
 
             <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 mt-2">
-              Manage all platform accounts, roles, and account status.
+              Here is a quick overview of your team activity and performance.
             </p>
           </div>
         </div>
@@ -272,6 +267,9 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
+
+      {/* Intern Summary Statistic Cards */}
+      <InternStatCards />
 
       {/* Search and Filters */}
       <Card className="p-5 md:p-6 mb-6 border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-white via-slate-50 to-indigo-50/60 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 shadow-[0_14px_35px_rgba(15,23,42,0.06)] dark:shadow-none">
