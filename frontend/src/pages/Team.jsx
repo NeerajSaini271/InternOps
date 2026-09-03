@@ -4,7 +4,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/axios';
 import { resolveUploadUrl } from '../lib/uploadUrl';
 import useAuthStore from '../store/auth';
-import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  List,
+  Users,
+} from 'lucide-react';
 import CustomSelect from '../components/CustomSelect';
 import CustomDatePicker from '../components/CustomDatePicker';
 import { ApiErrorState } from '../components/ui';
@@ -1499,7 +1505,10 @@ export default function Team() {
   const [roleFilter, setRoleFilter] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
   const [eligibilityFilter, setEligibilityFilter] = useState('');
-  const [view, setView] = useState('table');
+  const [view, setView] = useState(() => {
+    const storedView = window.localStorage.getItem('internops-team-view');
+    return storedView === 'cards' ? 'cards' : 'table';
+  });
   const [selected, setSelected] = useState(null);
   const [adding, setAdding] = useState(false);
   const tableScrollRef = useRef(null);
@@ -1507,6 +1516,10 @@ export default function Team() {
     canScrollLeft: false,
     canScrollRight: true,
   });
+
+  useEffect(() => {
+    window.localStorage.setItem('internops-team-view', view);
+  }, [view]);
 
   const user = useAuthStore((s) => s.user);
   const canAdd = rolesBelow(user?.role).length > 0;
@@ -1769,9 +1782,46 @@ export default function Team() {
           </div>
         </div>
 
-        {/* Right Side: Action Buttons */}
+        {/* Right Side: View and action controls */}
         <div className="flex items-center gap-2">
+          <div
+            className="flex rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900 shadow-sm"
+            role="group"
+            aria-label="Team member view"
+          >
+            <button
+              type="button"
+              onClick={() => setView('table')}
+              aria-label="Show team members as a table"
+              aria-pressed={view === 'table'}
+              title="Table view"
+              className={`p-3 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-inset ${
+                view === 'table'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <List className="w-5 h-5" aria-hidden="true" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setView('cards')}
+              aria-label="Show team members as cards"
+              aria-pressed={view === 'cards'}
+              title="Card view"
+              className={`p-3 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-inset ${
+                view === 'cards'
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <LayoutGrid className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </div>
+
           <button
+            type="button"
             onClick={exportCsv}
             className="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
           >
@@ -1866,58 +1916,6 @@ export default function Team() {
           placeholder="All"
           className="w-full sm:w-40 [&>button]:h-12 [&>button]:flex [&>button]:items-center [&>button]:whitespace-nowrap"
         />
-
-        <div className="flex w-full items-center justify-between gap-3">
-          <div className="flex h-12 items-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-            <button
-              onClick={() => setView('table')}
-              className={`px-4 py-3 text-sm font-bold transition ${
-                view === 'table'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800'
-              }`}
-            >
-              Table
-            </button>
-
-            <button
-              onClick={() => setView('cards')}
-              className={`px-4 py-3 text-sm font-bold transition ${
-                view === 'cards'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800'
-              }`}
-            >
-              Cards
-            </button>
-          </div>
-
-          {view === 'table' && (
-            <div className="ml-auto flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => scrollTeamTable(-1)}
-                disabled={!tableScrollState.canScrollLeft}
-                aria-label="Scroll team table left"
-                title="Scroll table left"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-35 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:bg-slate-700 dark:hover:text-white"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => scrollTeamTable(1)}
-                disabled={!tableScrollState.canScrollRight}
-                aria-label="Scroll team table right"
-                title="Scroll table right"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-35 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:bg-slate-700 dark:hover:text-white"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -2141,6 +2139,7 @@ export default function Team() {
                   <p>📞 {m.phone || '—'}</p>
                   <p>Domain: {m.internship_domain || '—'}</p>
                   <p>🎓 {m.college || '—'}</p>
+                  <p>🏢 {m.department_name || '—'}</p>
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-700 pt-3">
@@ -2161,6 +2160,26 @@ export default function Team() {
                       {m.verified_tasks}/{m.total_tasks}
                     </b>
                   </span>
+                </div>
+
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-slate-700">
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                      m.suspended
+                        ? STATUS_BADGE.TERMINATED
+                        : STATUS_BADGE[m.internship_status] ||
+                          STATUS_BADGE.ACTIVE
+                    }`}
+                  >
+                    {m.suspended
+                      ? 'Suspended'
+                      : m.internship_status || 'ACTIVE'}
+                  </span>
+                  {Number(m.pending_proofs) > 0 && (
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-300">
+                      {m.pending_proofs} pending
+                    </span>
+                  )}
                 </div>
               </div>
             );
