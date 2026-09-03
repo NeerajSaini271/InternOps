@@ -198,14 +198,15 @@ async def chat(
     response_model=ProviderResult,
 )
 async def generate_text(request: GenerationRequest):
-    provider = get_provider()
-    content = await provider.generate_text(request.prompt)
+    content, provider_name = await ai_orchestrator.generate_text_with_fallback(
+        request.prompt,
+        temperature=request.temperature,
+    )
     return ProviderResult(
-        provider=provider.provider_name,
+        provider=provider_name,
         cached=False,
         content=content,
     )
-
 # ---------------------------------------------------------------------------
 # POST /ai/generate-image
 # ---------------------------------------------------------------------------
