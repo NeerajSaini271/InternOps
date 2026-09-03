@@ -260,6 +260,8 @@ export default function DashboardLayout() {
   const [animatedPath, setAnimatedPath] = useState(null);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const impersonation = useAuthStore((s) => s.impersonation);
+  const exitImpersonation = useAuthStore((s) => s.exitImpersonation);
   const accessToken = useAuthStore((s) => s.accessToken);
   const queryClient = useQueryClient();
 
@@ -303,6 +305,7 @@ export default function DashboardLayout() {
     () => localStorage.getItem('theme') === 'dark'
   );
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [endingUserView, setEndingUserView] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const { data: me } = useQuery({
@@ -456,6 +459,24 @@ export default function DashboardLayout() {
     setMobileOpen(false);
   }, []);
 
+  const handleExitUserView = async () => {
+    if (endingUserView) return;
+    setEndingUserView(true);
+    try {
+      await api.post(
+        '/auth/impersonation/exit',
+        {},
+        { _suppressGlobalError: true }
+      );
+    } catch {
+      // The local admin session is still restored even if audit delivery fails.
+    } finally {
+      exitImpersonation();
+      queryClient.clear();
+      setEndingUserView(false);
+      navigate('/team', { replace: true });
+    }
+  };
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -744,6 +765,29 @@ export default function DashboardLayout() {
             </Link>
           </div>
         </header>
+        {impersonation && (
+          <div
+            className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-amber-300 bg-amber-50 px-4 py-2.5 text-amber-950 dark:border-amber-700 dark:bg-amber-950/60 dark:text-amber-100 sm:px-6"
+            role="status"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-extrabold">
+                Viewing InternOps as {displayName || user?.email}
+              </p>
+              <p className="truncate text-xs">
+                Read-only admin troubleshooting view
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleExitUserView}
+              disabled={endingUserView}
+              className="rounded-xl bg-amber-900 px-4 py-2 text-xs font-extrabold text-white disabled:opacity-60 dark:bg-amber-200 dark:text-amber-950"
+            >
+              {endingUserView ? 'Exiting...' : 'Exit User View'}
+            </button>
+          </div>
+        )}
         <main className="flex-1 overflow-auto p-5 sm:p-6">
           <Suspense fallback={<RouteRefreshSkeleton />}>
             <div

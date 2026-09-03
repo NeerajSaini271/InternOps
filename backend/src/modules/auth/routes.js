@@ -333,6 +333,56 @@ async function routes(fastify) {
     }
   );
 
+  fastify.post(
+    '/impersonation/start',
+    {
+      preHandler: [auth, rbac('ADMIN'), sanitize],
+      schema: {
+        tags: ['Authentication'],
+        description: 'Start a short-lived read-only user view',
+        body: {
+          type: 'object',
+          required: ['targetUserId', 'password', 'reason'],
+          properties: {
+            targetUserId: { type: 'string', format: 'uuid' },
+            password: { type: 'string', minLength: 1 },
+            reason: { type: 'string', minLength: 5, maxLength: 300 },
+          },
+        },
+      },
+    },
+    async (req) =>
+      service.startImpersonation(
+        req.user,
+        req.body.targetUserId,
+        req.body.password,
+        req.body.reason.trim(),
+        req.ip,
+        req.headers['user-agent']
+      )
+  );
+  fastify.post(
+    '/impersonation/exit',
+    {
+      preHandler: [auth, sanitize],
+      schema: {
+        tags: ['Authentication'],
+        description: 'Exit read-only user view',
+      },
+    },
+    async (req) => {
+      if (!req.user.impersonatedBy) {
+        return { message: 'No active user view' };
+      }
+      await service.exitImpersonation(
+        req.user.impersonatedBy,
+        req.user.id,
+        req.ip,
+        req.headers['user-agent']
+      );
+      return { message: 'User view ended' };
+    }
+  );
   // Get CSRF token
   fastify.get(
     '/csrf-token',

@@ -63,6 +63,7 @@ function Private({ children }) {
   const token = useAuthStore((s) => s.accessToken);
   const user = useAuthStore((s) => s.user);
   const hydrated = useAuthStore((s) => s.hydrated);
+  const impersonation = useAuthStore((s) => s.impersonation);
 
   if (!hydrated) {
     return user ? children : null;
@@ -70,7 +71,11 @@ function Private({ children }) {
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
-  if (user?.mustChangePassword && window.location.pathname !== '/profile') {
+  if (
+    user?.mustChangePassword &&
+    !impersonation &&
+    window.location.pathname !== '/profile'
+  ) {
     return <Navigate to="/profile" replace />;
   }
 

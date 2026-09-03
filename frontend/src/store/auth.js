@@ -107,6 +107,8 @@ const useAuthStore = create((set) => ({
   hydrated: false,
   storageError: hasStorageError,
   systemError: null,
+  impersonation: null,
+  adminSession: null,
 
   setAuth: ({ accessToken, user }) =>
     set((prev) => {
@@ -137,6 +139,20 @@ const useAuthStore = create((set) => ({
       };
     }),
 
+  startImpersonation: ({ accessToken, user, impersonation }) =>
+    set((state) => ({
+      accessToken,
+      user,
+      impersonation,
+      adminSession: { accessToken: state.accessToken, user: state.user },
+    })),
+  exitImpersonation: () =>
+    set((state) => ({
+      accessToken: state.adminSession?.accessToken || null,
+      user: state.adminSession?.user || null,
+      impersonation: null,
+      adminSession: null,
+    })),
   setHydrated: () => set({ hydrated: true }),
 
   setSystemError: (message) => set({ systemError: message }),
@@ -147,7 +163,13 @@ const useAuthStore = create((set) => ({
     safeSet('user', null);
     clearCsrfToken();
     clearSentryUser();
-    set({ accessToken: null, user: null, storageError: hasStorageError });
+    set({
+      accessToken: null,
+      user: null,
+      impersonation: null,
+      adminSession: null,
+      storageError: hasStorageError,
+    });
   },
 }));
 

@@ -44,6 +44,21 @@ function generateAccessToken(user) {
   );
 }
 
+function generateImpersonationAccessToken(user, admin) {
+  return jwt.sign(
+    {
+      id: user.id,
+      role: user.role,
+      departmentId: user.department_id,
+      typ: 'access',
+      jti: crypto.randomUUID(),
+      impersonatedBy: admin.id,
+      impersonationReadOnly: true,
+    },
+    getAccessSecret(),
+    { expiresIn: '10m' }
+  );
+}
 function generateRefreshToken(user) {
   return jwt.sign(
     {
@@ -84,6 +99,7 @@ function verifyRefreshToken(t) {
 module.exports = {
   hashToken,
   generateAccessToken,
+  generateImpersonationAccessToken,
   generateRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,

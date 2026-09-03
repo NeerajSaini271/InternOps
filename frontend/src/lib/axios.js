@@ -290,6 +290,22 @@ api.interceptors.response.use(
 
     const hasToken = !!getMemoryAccessToken();
 
+    if (
+      status === 401 &&
+      !original._retry &&
+      !isAuthRoute &&
+      hasToken &&
+      _authStore?.getState?.().impersonation
+    ) {
+      original._retry = true;
+      _authStore.getState().exitImpersonation();
+      const adminToken = getMemoryAccessToken();
+      if (adminToken) {
+        original.headers = original.headers || {};
+        original.headers.Authorization = `Bearer ${adminToken}`;
+        return api(original);
+      }
+    }
     if (status === 401 && !original._retry && !isAuthRoute && hasToken) {
       // Another refresh is already in flight — queue this request.
       if (isRefreshing) {

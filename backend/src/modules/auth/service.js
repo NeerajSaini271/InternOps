@@ -3,6 +3,7 @@ const { UnauthorizedError } = require('../../utils/errors');
 const repo = require('./repository');
 const {
   generateAccessToken,
+  generateImpersonationAccessToken,
   generateRefreshToken,
   hashToken,
   verifyRefreshToken,
@@ -307,4 +308,74 @@ async function logout(
   });
 }
 
-module.exports = { register, login, refreshTokens, logout };
+async function startImpersonation(
+  admin,
+  targetUserId,
+  password,
+  reason,
+  ip,
+  userAgent
+) {
+  if (admin.role !== 'ADMIN' || admin.impersonatedBy) {
+    const error = new Error(
+      'Only a signed-in administrator can view as a user'
+    );
+    error.statusCode = 403;
+    throw error;
+  }
+  const [adminUser, target] = await Promise.all([
+    repo.findById(admin.id),
+    repo.findById(targetUserId),
+  ]);
+  if (!adminUser || !(await repo.verifyPassword(adminUser, password))) {
+    throw new UnauthorizedError('Administrator password is incorrect');
+  }
+  if (
+    !target ||
+    target.suspended ||
+    target.deleted_at ||
+    target.role === 'ADMIN'
+  ) {
+    const error = new Error('This account cannot be viewed');
+    error.statusCode = target ? 403 : 404;
+    throw error;
+  }
+  const accessToken = generateImpersonationAccessToken(target, adminUser);
+  await createAuditLog({
+    userId: adminUser.id,
+    action: 'IMPERSONATION_STARTED',
+    resourceType: 'user',
+    resourceId: target.id,
+    details: { reason, targetRole: target.role, readOnly: true },
+    ipAddress: ip,
+    userAgent,
+  });
+  return {
+    accessToken,
+    user: publicUser(target),
+    impersonation: {
+      admin: publicUser(adminUser),
+      reason,
+      expiresInSeconds: 600,
+    },
+  };
+}
+async function exitImpersonation(adminId, targetUserId, ip, userAgent) {
+  await createAuditLog({
+    userId: adminId,
+    action: 'IMPERSONATION_EXITED',
+    resourceType: 'user',
+    resourceId: targetUserId,
+    details: { readOnly: true },
+    ipAddress: ip,
+    userAgent,
+  });
+}
+module.exports = {
+  register,
+  login,
+  refreshTokens,
+  logout,
+  startImpersonation,
+  exitImpersonation,
+};

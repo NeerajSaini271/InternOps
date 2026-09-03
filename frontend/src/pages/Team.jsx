@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
 import { resolveUploadUrl } from '../lib/uploadUrl';
 import useAuthStore from '../store/auth';
@@ -10,6 +11,8 @@ import {
   LayoutGrid,
   List,
   Users,
+  Eye,
+  ShieldCheck,
 } from 'lucide-react';
 import CustomSelect from '../components/CustomSelect';
 import CustomDatePicker from '../components/CustomDatePicker';
@@ -709,6 +712,7 @@ function Row({ label, value }) {
 
 function MemberDetail({ memberId, onClose }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
 
   const [form, setForm] = useState(null);
@@ -719,6 +723,9 @@ function MemberDetail({ memberId, onClose }) {
   const [newRole, setNewRole] = useState('');
   const [newManager, setNewManager] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showUserView, setShowUserView] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [viewReason, setViewReason] = useState('');
 
   const {
     data: teamMembers = [],
@@ -932,6 +939,21 @@ function MemberDetail({ memberId, onClose }) {
     },
   });
 
+  const startUserViewMut = useMutation({
+    mutationFn: () =>
+      api.post('/auth/impersonation/start', {
+        targetUserId: memberId,
+        password: adminPassword,
+        reason: viewReason.trim(),
+      }),
+    onSuccess: ({ data }) => {
+      useAuthStore.getState().startImpersonation(data);
+      queryClient.clear();
+      navigate('/dashboard', { replace: true });
+    },
+    onError: (err) =>
+      setError(err.response?.data?.error || 'Unable to start user view'),
+  });
   const pct = member ? attendancePct(member) : null;
   const lifecycleToday = localDateValue();
 
@@ -1507,6 +1529,73 @@ function MemberDetail({ memberId, onClose }) {
                 </div>
               )}
 
+              {user?.role === 'ADMIN' && member.role !== 'ADMIN' && (
+                <button
+                  type="button"
+                  onClick={() => setShowUserView(true)}
+                  disabled={member.suspended}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-slate-900"
+                >
+                  <Eye className="h-4 w-4" /> View as User
+                </button>
+              )}
+              {showUserView && (
+                <div className="rounded-3xl border border-indigo-200 bg-indigo-50 p-5 dark:border-indigo-800 dark:bg-indigo-950/40">
+                  <div className="mb-4 flex items-start gap-3">
+                    <ShieldCheck className="mt-0.5 h-5 w-5 text-indigo-600" />
+                    <div>
+                      <h4 className="font-extrabold">
+                        Start read-only user view?
+                      </h4>
+                      <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                        Re-enter the administrator password and explain the
+                        troubleshooting reason. Changes are blocked and the
+                        session expires after 10 minutes.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <input
+                      type="password"
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
+                      placeholder="Administrator password"
+                      className="w-full rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                    />
+                    <textarea
+                      value={viewReason}
+                      onChange={(e) => setViewReason(e.target.value)}
+                      placeholder="Reason for viewing this account"
+                      maxLength={300}
+                      rows={3}
+                      className="w-full rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => startUserViewMut.mutate()}
+                        disabled={
+                          startUserViewMut.isPending ||
+                          !adminPassword ||
+                          viewReason.trim().length < 5
+                        }
+                        className="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-extrabold text-white disabled:opacity-50"
+                      >
+                        {startUserViewMut.isPending
+                          ? 'Starting...'
+                          : 'View as User'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowUserView(false)}
+                        className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Suspend / activate */}
               <button
                 onClick={() => statusMut.mutate(!member.suspended)}
