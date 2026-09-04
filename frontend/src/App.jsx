@@ -27,9 +27,11 @@ const Team = lazy(() => import('./pages/Team'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Sessions = lazy(() => import('./pages/Sessions'));
 const Meetings = lazy(() => import('./pages/Meetings'));
-const Notifications = lazy(() => import('./pages/Notifications'));
 const InternOpsAssistant = lazy(
   () => import('./components/InternOpsAssistant')
+);
+const PerformanceIntelligence = lazy(
+  () => import('./pages/PerformanceIntelligence')
 );
 const InternOps = lazy(() => import('./pages/InternOps'));
 const Reports = lazy(() => import('./pages/admin/Reports'));
@@ -286,6 +288,10 @@ export default function App() {
             <Route path="sessions" element={<Sessions />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="assistant" element={<InternOpsAssistant />} />
+            <Route
+              path="performance-intelligence"
+              element={<PerformanceIntelligence />}
+            />
 
             {/* Admin/Manager Routes */}
             <Route
