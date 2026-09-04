@@ -55,10 +55,12 @@ import { QUERY_KEYS } from '../constants/queryKeys';
 import { ROLE_LABEL } from '../constants/roles';
 import FloatingChatbot from '../components/FloatingChatbot';
 import RouteRefreshSkeleton from '../components/loading/RouteRefreshSkeleton';
+import RouteInitialLoading from '../components/loading/RouteInitialLoading';
 
 const MANAGER_ROLES = ['ADMIN', 'SENIOR_TL', 'TL', 'CAPTAIN'];
 const ADMIN_AND_SENIOR_TL_ROLES = ['ADMIN', 'SENIOR_TL'];
 const ADMIN_ONLY_ROLES = ['ADMIN'];
+const HR_ROLES = ['ADMIN', 'HR'];
 const DIRECTORY_ROLES = ['ADMIN', 'SENIOR_TL', 'TL'];
 
 const nav = [
@@ -80,7 +82,7 @@ const nav = [
     path: '/hr',
     label: 'HR',
     icon: BriefcaseBusiness,
-    allowedRoles: ADMIN_ONLY_ROLES,
+    allowedRoles: HR_ROLES,
   },
   {
     path: '/attendance',
@@ -215,6 +217,12 @@ const adminNav = [
 
 const FULL_LOGO_SRC = '/UptoSkills.webp';
 const MINI_LOGO_SRC = '/Uptoskills_log_fevicon.png';
+const COORDINATED_LOADING_ROUTES = new Set([
+  '/dashboard',
+  '/team',
+  '/hr',
+  '/profile',
+]);
 
 function canShowNavItem(item, role, flags, flagsLoaded) {
   if (item.excludedRoles && item.excludedRoles.includes(role)) return false;
@@ -258,11 +266,32 @@ const NavLink = memo(({ n, active, collapsed, onLinkClick }) => {
 });
 NavLink.displayName = 'NavLink';
 
+let authHydrationPromise = null;
+function waitForAuthHydration() {
+  if (useAuthStore.getState().hydrated) return Promise.resolve();
+  if (!authHydrationPromise) {
+    authHydrationPromise = new Promise((resolve) => {
+      const unsubscribe = useAuthStore.subscribe((state) => {
+        if (!state.hydrated) return;
+        unsubscribe();
+        authHydrationPromise = null;
+        resolve();
+      });
+    });
+  }
+  return authHydrationPromise;
+}
+function AuthHydrationGate({ children }) {
+  const hydrated = useAuthStore((state) => state.hydrated);
+  if (!hydrated) throw waitForAuthHydration();
+  return children;
+}
 export default function DashboardLayout() {
   const loc = useLocation();
   const navigate = useNavigate();
   const previousPathRef = useRef(loc.pathname);
-  const [animatedPath, setAnimatedPath] = useState(null);
+  const [animatedRoutePath, setAnimatedRoutePath] = useState(null);
+  const shouldAnimateRoute = animatedRoutePath === loc.pathname;
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const impersonation = useAuthStore((s) => s.impersonation);
@@ -486,11 +515,10 @@ export default function DashboardLayout() {
     logout();
     navigate('/login');
   };
-
   useLayoutEffect(() => {
     if (previousPathRef.current !== loc.pathname) {
+      setAnimatedRoutePath(loc.pathname);
       previousPathRef.current = loc.pathname;
-      setAnimatedPath(loc.pathname);
     }
   }, [loc.pathname]);
 
@@ -794,16 +822,25 @@ export default function DashboardLayout() {
           </div>
         )}
         <main className="flex-1 overflow-auto p-5 sm:p-6">
-          <Suspense fallback={<RouteRefreshSkeleton />}>
-            <div
-              key={loc.pathname}
-              className={
-                animatedPath === loc.pathname ? 'animate-fade-in-up' : undefined
-              }
-            >
-              <Outlet />
-            </div>
-          </Suspense>
+          <div key={loc.pathname} className="min-h-[calc(100vh-7rem)]">
+            {COORDINATED_LOADING_ROUTES.has(loc.pathname) ? (
+              <RouteInitialLoading animate={shouldAnimateRoute}>
+                <Outlet />
+              </RouteInitialLoading>
+            ) : (
+              <Suspense fallback={<RouteRefreshSkeleton />}>
+                <AuthHydrationGate>
+                  <div
+                    className={
+                      shouldAnimateRoute ? 'animate-fade-in-up' : undefined
+                    }
+                  >
+                    <Outlet />
+                  </div>
+                </AuthHydrationGate>
+              </Suspense>
+            )}
+          </div>
         </main>
       </div>
 

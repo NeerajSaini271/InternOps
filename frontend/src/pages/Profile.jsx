@@ -32,7 +32,7 @@ import {
 } from '../components/ui';
 import useAuthStore from '../store/auth';
 import useFeatureFlagsStore from '../store/featureFlags';
-import RouteRefreshSkeleton from '../components/loading/RouteRefreshSkeleton';
+import { useRouteInitialLoading } from '../components/loading/RouteInitialLoading';
 
 const ROLE_COLOR = {
   ADMIN: 'purple',
@@ -228,9 +228,9 @@ export default function Profile() {
   const isStrongPassword = Object.values(passwordChecks).every(Boolean);
   const passwordsMatch =
     confirmPassword.length > 0 && newPassword === confirmPassword;
-  if (!isError && (!hydrated || !accessToken || isLoading || !profile)) {
-    return <RouteRefreshSkeleton />;
-  }
+  useRouteInitialLoading(
+    !isError && (!hydrated || !accessToken || isLoading || !profile)
+  );
   if (isError) {
     return (
       <div className="mx-auto max-w-7xl">

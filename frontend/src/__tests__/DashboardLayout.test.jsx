@@ -98,27 +98,31 @@ describe('DashboardLayout Component Tests', () => {
     );
   };
 
-  it('keeps the real shell mounted while lazy page content suspends', () => {
+  it('keeps one skeleton owner mounted for coordinated initial loading', () => {
     const layoutSource = fs.readFileSync(
       path.resolve(process.cwd(), 'src/layouts/DashboardLayout.jsx'),
       'utf8'
     );
-    expect(layoutSource).not.toContain(
-      'const hydrated = useAuthStore((s) => s.hydrated);'
+    const coordinatorSource = fs.readFileSync(
+      path.resolve(
+        process.cwd(),
+        'src/components/loading/RouteInitialLoading.jsx'
+      ),
+      'utf8'
     );
-    expect(layoutSource).not.toContain('DashboardLayout({ content = null })');
     expect(layoutSource).toContain(
-      '<Suspense fallback={<RouteRefreshSkeleton />}>'
+      'COORDINATED_LOADING_ROUTES.has(loc.pathname)'
     );
-    expect(layoutSource).toContain('key={loc.pathname}');
     expect(layoutSource).toContain(
-      "animatedPath === loc.pathname ? 'animate-fade-in-up' : undefined"
+      '<RouteInitialLoading animate={shouldAnimateRoute}>'
     );
-    expect(layoutSource).toMatch(
-      /<main[\s\S]*<Suspense fallback=\{<RouteRefreshSkeleton \/>\}>[\s\S]*<Outlet \/>[\s\S]*<\/Suspense>[\s\S]*<\/main>/
+    expect(coordinatorSource).toContain(
+      '{loading && <RouteRefreshSkeleton />}'
+    );
+    expect(coordinatorSource).toContain(
+      '<Suspense fallback={null}>{children}</Suspense>'
     );
   });
-
   it('keeps feature navigation and account footer stable during hydration', () => {
     const layoutSource = fs.readFileSync(
       path.resolve(process.cwd(), 'src/layouts/DashboardLayout.jsx'),

@@ -18,7 +18,7 @@ import CustomSelect from '../components/CustomSelect';
 import CustomDatePicker from '../components/CustomDatePicker';
 import { ApiErrorState } from '../components/ui';
 import { getTeamRoleBreakdown } from '../utils/teamRoleBreakdown';
-import RouteRefreshSkeleton from '../components/loading/RouteRefreshSkeleton';
+import { useRouteInitialLoading } from '../components/loading/RouteInitialLoading';
 
 const ROLE_LABEL = {
   SENIOR_TL: 'Senior TL',
@@ -1975,9 +1975,7 @@ export default function Team() {
     }
   };
 
-  if (!hydrated || !accessToken || isLoading) {
-    return <RouteRefreshSkeleton />;
-  }
+  useRouteInitialLoading(!hydrated || !accessToken || isLoading);
 
   if (isError) {
     return (

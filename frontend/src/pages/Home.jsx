@@ -5,7 +5,7 @@ import api from '../lib/axios';
 import useAuthStore from '../store/auth';
 import { QUERY_KEYS } from '../constants/queryKeys';
 import { Card, StatCard, ApiErrorState } from '../components/ui';
-import RouteRefreshSkeleton from '../components/loading/RouteRefreshSkeleton';
+import { useRouteInitialLoading } from '../components/loading/RouteInitialLoading';
 import { getTeamRoleBreakdown } from '../utils/teamRoleBreakdown';
 
 function attendancePct(m) {
@@ -54,9 +54,7 @@ function ManagerHome({ user }) {
     enabled: hydrated && !!accessToken,
   });
 
-  if (!hydrated || !accessToken || isLoading) {
-    return <RouteRefreshSkeleton />;
-  }
+  useRouteInitialLoading(!hydrated || !accessToken || isLoading);
 
   if (isError) {
     return (
@@ -328,9 +326,7 @@ function InternHome({ user }) {
     enabled: hydrated && !!accessToken && !!user,
   });
 
-  if (!hydrated || !accessToken || isLoading) {
-    return <RouteRefreshSkeleton />;
-  }
+  useRouteInitialLoading(!hydrated || !accessToken || isLoading);
 
   if (isError) {
     return (
