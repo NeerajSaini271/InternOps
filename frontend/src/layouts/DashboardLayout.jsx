@@ -101,6 +101,11 @@ const nav = [
     allowedRoles: ADMIN_AND_SENIOR_TL_ROLES,
   },
   {
+    path: '/performance-intelligence',
+    label: 'AI Performance Review',
+    icon: Sparkles,
+  },
+  {
     path: '/reports',
     label: 'Reports',
     icon: FileText,
