@@ -38,12 +38,10 @@ async function assertAccess(req, reply, internId) {
     }
   }
 
-  reply
-    .status(403)
-    .send({
-      error:
-        'Access denied: You do not have permission to view or generate reviews for this intern.',
-    });
+  reply.status(403).send({
+    error:
+      'Access denied: You do not have permission to view or generate reviews for this intern.',
+  });
   return false;
 }
 
