@@ -22,14 +22,13 @@ describe('safe refresh storage contract', () => {
     expect(registration).not.toContain('removeLegacyAuthStorage()');
   });
 
-  it('keeps cache after success but clears authentication after failure', () => {
-    const successEnd = axiosSource.indexOf('catch (refreshErr)');
-    const successStart = axiosSource.lastIndexOf('if (newToken)', successEnd);
-    const successBlock = axiosSource.slice(successStart, successEnd);
-    expect(successBlock).not.toContain('removeLegacyAuthStorage()');
-    expect(axiosSource.slice(successEnd)).toContain(
-      'removeLegacyAuthStorage()'
-    );
-    expect(axiosSource).toContain('_authStore.getState().logout()');
+  it('coordinates refresh rotation and ignores stale failures', () => {
+    expect(axiosSource).toContain('let sharedRefreshPromise = null');
+    expect(axiosSource).toContain('navigator.locks.request(');
+    expect(axiosSource).toContain("'internops-refresh-token'");
+    expect(axiosSource).toContain('current.authGeneration === generation');
+    expect(axiosSource).toContain('export function refreshSession()');
+    expect(authSource).toContain('authGeneration: 0');
+    expect(authSource).toContain('authGeneration: prev.authGeneration + 1');
   });
 });

@@ -107,6 +107,8 @@ describe('refresh loading and route preservation contract', () => {
 
   it('keeps the single boot refresh promise and one Profile route', () => {
     expect(app).toContain('let bootRefreshPromise = null');
+    expect(app).toContain('refreshSession()');
+    expect(app).not.toContain("api.post('/auth/refresh'");
     expect(app.match(/path="profile"/g)).toHaveLength(1);
   });
   it('keeps Profile hidden behind its exact page skeleton until data is ready', () => {
@@ -123,5 +125,11 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).toContain('xl:w-[500px]');
     expect(skeleton).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]');
     expect(skeleton).toContain('Array.from({ length: 6 }');
+  });
+  it('keeps the public Login route out of the dashboard skeleton fallback', () => {
+    expect(app).toContain("import Login from './pages/Login';");
+    expect(app).not.toMatch(/const\s+Login\s*=\s*lazy/);
+    expect(app).toContain('path="/login" element={<Login />}');
+    expect(app).toContain('<Suspense fallback={<PageLoader />}>');
   });
 });

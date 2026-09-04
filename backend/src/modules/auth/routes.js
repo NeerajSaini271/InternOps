@@ -276,7 +276,11 @@ async function routes(fastify) {
         });
       }
 
-      const tokens = await service.refreshTokens(token, req.ip);
+      const tokens = await service.refreshTokens(
+        token,
+        req.ip,
+        req.headers['user-agent']
+      );
 
       reply.setCookie('refreshToken', tokens.refreshToken, {
         httpOnly: true,

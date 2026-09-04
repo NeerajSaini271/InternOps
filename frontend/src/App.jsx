@@ -9,15 +9,15 @@ import { useEffect, lazy, Suspense } from 'react';
 import DashboardLayout from './layouts/DashboardLayout';
 import useAuthStore from './store/auth';
 import useFeatureFlagsStore from './store/featureFlags';
-import api from './lib/axios';
+import { refreshSession } from './lib/axios';
 import RoleGuard from './components/RoleGuard';
 import ErrorBoundary from './components/ErrorBoundary';
 import HR from './pages/HR';
 import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
 import RouteRefreshSkeleton from './components/loading/RouteRefreshSkeleton';
 
 // Lazy load page components
-const Login = lazy(() => import('./pages/Login'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Tasks = lazy(() => import('./pages/Tasks'));
@@ -105,23 +105,20 @@ export default function App() {
 
   useEffect(() => {
     if (!bootRefreshPromise) {
-      bootRefreshPromise = api.post('/auth/refresh', {}).then(async (res) => {
-        const refreshedUser = res.data.user;
-        setAuth({
-          accessToken: res.data.accessToken,
-          user: refreshedUser,
-        });
-        // Feature flags are protected resources. Temporary-password accounts
-        // may access only Profile until the required password change succeeds.
-        if (refreshedUser?.mustChangePassword) {
-          resetFlags();
-        } else {
-          Promise.resolve(fetchFlags()).catch(() => {
-            // Feature flags use their own safe defaults and must not block boot.
-          });
+      bootRefreshPromise = refreshSession().then(
+        async ({ user: refreshedUser }) => {
+          // Feature flags are protected resources. Temporary-password accounts
+          // may access only Profile until the required password change succeeds.
+          if (refreshedUser?.mustChangePassword) {
+            resetFlags();
+          } else {
+            Promise.resolve(fetchFlags()).catch(() => {
+              // Feature flags use their own safe defaults and must not block boot.
+            });
+          }
+          return refreshedUser;
         }
-        return res;
-      });
+      );
     }
 
     bootRefreshPromise

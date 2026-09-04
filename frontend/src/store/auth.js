@@ -109,6 +109,7 @@ const useAuthStore = create((set) => ({
   systemError: null,
   impersonation: null,
   adminSession: null,
+  authGeneration: 0,
 
   setAuth: ({ accessToken, user }) =>
     set((prev) => {
@@ -136,6 +137,7 @@ const useAuthStore = create((set) => ({
         accessToken: nextToken,
         user: nextUser,
         storageError: hasStorageError,
+        authGeneration: prev.authGeneration + 1,
       };
     }),
 
@@ -169,6 +171,7 @@ const useAuthStore = create((set) => ({
       impersonation: null,
       adminSession: null,
       storageError: hasStorageError,
+      authGeneration: useAuthStore.getState().authGeneration + 1,
     });
   },
 }));
