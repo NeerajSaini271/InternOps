@@ -38,8 +38,10 @@ describe('avatar upload persistence contract', () => {
       'const mimeType = MIME_BY_EXT[path.extname(safeFileName).toLowerCase()]'
     );
     expect(source).toContain(
-      'return reply.type(mimeType).send(fs.createReadStream(filePath))'
+      ".header('Cross-Origin-Resource-Policy', 'cross-origin')"
     );
+    expect(source).toContain('.type(mimeType)');
+    expect(source).toContain('.send(fs.createReadStream(filePath))');
     expect(source).toContain("error: 'Unsupported image type'");
   });
 });
