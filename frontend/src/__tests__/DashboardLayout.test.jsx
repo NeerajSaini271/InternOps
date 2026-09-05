@@ -117,7 +117,7 @@ describe('DashboardLayout Component Tests', () => {
       '<RouteInitialLoading animate={shouldAnimateRoute}>'
     );
     expect(coordinatorSource).toContain(
-      '{loading && <RouteRefreshSkeleton />}'
+      '{loading ? <RouteRefreshSkeleton /> : null}'
     );
     expect(coordinatorSource).toContain(
       '<Suspense fallback={null}>{children}</Suspense>'
