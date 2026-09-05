@@ -45,6 +45,7 @@ module.exports = async function routes(fastify, opts) {
     prefix: '/hierarchy',
   });
   fastify.register(require('./modules/team/routes'), { prefix: '/team' });
+  fastify.register(require('./modules/hr/routes'), { prefix: '/hr' });
   fastify.register(require('./modules/attendance/routes'), {
     prefix: '/attendance',
   });

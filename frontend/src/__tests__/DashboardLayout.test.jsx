@@ -1,4 +1,6 @@
 import React from 'react';
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -95,6 +97,43 @@ describe('DashboardLayout Component Tests', () => {
       </QueryClientProvider>
     );
   };
+
+  it('keeps one skeleton owner mounted for coordinated initial loading', () => {
+    const layoutSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/layouts/DashboardLayout.jsx'),
+      'utf8'
+    );
+    const coordinatorSource = fs.readFileSync(
+      path.resolve(
+        process.cwd(),
+        'src/components/loading/RouteInitialLoading.jsx'
+      ),
+      'utf8'
+    );
+    expect(layoutSource).toContain(
+      'COORDINATED_LOADING_ROUTES.has(loc.pathname)'
+    );
+    expect(layoutSource).toContain(
+      '<RouteInitialLoading animate={shouldAnimateRoute}>'
+    );
+    expect(coordinatorSource).toContain(
+      '{loading ? <RouteRefreshSkeleton /> : null}'
+    );
+    expect(coordinatorSource).toContain(
+      '<Suspense fallback={null}>{children}</Suspense>'
+    );
+  });
+  it('keeps feature navigation and account footer stable during hydration', () => {
+    const layoutSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/layouts/DashboardLayout.jsx'),
+      'utf8'
+    );
+    expect(layoutSource).toContain(
+      '!flagsLoaded || flags[item.featureFlag] === true'
+    );
+    expect(layoutSource).not.toContain('user?.email;');
+    expect(layoutSource).toContain('aria-label="Loading account name"');
+  });
 
   it('renders common navigation links for any logged-in user', async () => {
     useAuthStore.setState({
