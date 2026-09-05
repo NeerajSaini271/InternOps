@@ -413,4 +413,45 @@ describe('DashboardLayout Component Tests', () => {
       container.querySelector('img[src$="/uploads/cached-avatar.png"]')
     ).not.toBeInTheDocument();
   });
+
+  it('does not show the default admin avatar before auth hydration', async () => {
+    api.get.mockImplementation(() => Promise.resolve({ data: {} }));
+    useAuthStore.setState({
+      accessToken: null,
+      hydrated: false,
+      user: {
+        id: '1',
+        email: 'admin@example.com',
+        role: 'ADMIN',
+        full_name: 'System Admin',
+      },
+    });
+
+    const { container } = renderLayout();
+
+    expect(
+      container.querySelector('img[src="/admin-default-avatar.svg"]')
+    ).not.toBeInTheDocument();
+
+    useAuthStore.setState({
+      accessToken: 'token',
+      hydrated: true,
+      user: {
+        id: '1',
+        email: 'admin@example.com',
+        role: 'ADMIN',
+        full_name: 'System Admin',
+        avatar_url: '/uploads/refreshed-avatar.png',
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        container.querySelectorAll('img[src$="/uploads/refreshed-avatar.png"]')
+      ).toHaveLength(2);
+    });
+    expect(
+      container.querySelector('img[src="/admin-default-avatar.svg"]')
+    ).not.toBeInTheDocument();
+  });
 });

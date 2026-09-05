@@ -293,6 +293,7 @@ export default function DashboardLayout() {
   const [animatedRoutePath, setAnimatedRoutePath] = useState(null);
   const shouldAnimateRoute = animatedRoutePath === loc.pathname;
   const user = useAuthStore((s) => s.user);
+  const hydrated = useAuthStore((s) => s.hydrated);
   const logout = useAuthStore((s) => s.logout);
   const impersonation = useAuthStore((s) => s.impersonation);
   const exitImpersonation = useAuthStore((s) => s.exitImpersonation);
@@ -384,9 +385,9 @@ export default function DashboardLayout() {
   const displayName = me?.full_name || user?.full_name || user?.fullName || '';
   const displayNameReady = Boolean(displayName);
   const profileAvatar = me ? me.avatar_url : user?.avatar_url;
-  const avatarUrl = resolveUploadUrl(
-    profileAvatar || (role === 'ADMIN' ? '/admin-default-avatar.svg' : null)
-  );
+  const defaultAvatar =
+    hydrated && role === 'ADMIN' ? '/admin-default-avatar.svg' : null;
+  const avatarUrl = resolveUploadUrl(profileAvatar || defaultAvatar);
 
   useEffect(() => {
     localStorage.setItem('sidebar', collapsed ? 'collapsed' : 'open');
