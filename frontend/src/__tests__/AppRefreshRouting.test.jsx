@@ -125,7 +125,7 @@ describe('refresh loading and route preservation contract', () => {
     const profile = read('src/pages/Profile.jsx');
     expect(profile).toContain('useRouteInitialLoading(');
     expect(profile).not.toContain('return <RouteRefreshSkeleton />');
-    expect(skeleton).toContain('function ProfileSkeleton()');
+    expect(skeleton).toContain('function ProfileSkeleton({ role })');
   });
   it('keeps the public Login route out of the dashboard skeleton fallback', () => {
     expect(app).toContain("import Login from './pages/Login';");
@@ -348,5 +348,24 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).toContain('space-y-3');
     expect(skeleton).toContain('h-5 w-24 rounded-md');
     expect(skeleton).toContain('h-8 w-8 rounded-xl');
+  });
+
+  it('matches Profile account details to the authenticated role', () => {
+    const profile = read('src/pages/Profile.jsx');
+
+    expect(skeleton).toContain('function ProfileSkeleton({ role })');
+    expect(skeleton).toContain("role === 'ADMIN' ? 3");
+    expect(skeleton).toContain("role === 'SENIOR_TL' ? 5 : 4");
+    expect(skeleton).toContain('accountDetailCount === 3');
+    expect(skeleton).toContain("'sm:grid-cols-3 xl:w-[500px]'");
+    expect(skeleton).toContain("'sm:grid-cols-2 xl:w-[500px]'");
+    expect(skeleton).toContain('<ProfileSkeleton role={role} />');
+    expect(skeleton).toContain('mx-auto h-24 w-24 rounded-3xl');
+    expect(skeleton).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]');
+
+    expect(profile).toContain('sm:grid-cols-3 xl:w-[500px]');
+    expect(profile).toContain('sm:grid-cols-2 xl:w-[500px]');
+    expect(profile).toContain('h-24 w-24 rounded-3xl');
+    expect(profile).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]');
   });
 });

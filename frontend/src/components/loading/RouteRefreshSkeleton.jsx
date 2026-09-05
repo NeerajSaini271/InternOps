@@ -789,103 +789,125 @@ function SessionsSkeleton() {
     </>
   );
 }
-function ProfileSkeleton() {
+function ProfileSkeleton({ role }) {
+  const accountDetailCount =
+    role === 'ADMIN' ? 3 : role === 'SENIOR_TL' ? 5 : 4;
+  const accountDetailGrid =
+    accountDetailCount === 3
+      ? 'sm:grid-cols-3 xl:w-[500px]'
+      : 'sm:grid-cols-2 xl:w-[500px]';
+
   return (
     <>
-      <div className="mb-5 flex items-center gap-3">
+      <div className="mb-[38px] flex items-center gap-3">
         <Block className="h-11 w-11 shrink-0 rounded-xl" />
-        <div className="space-y-2">
+        <div>
           <Block className="h-7 w-32 rounded-lg" />
-          <Block className="h-4 w-64 max-w-[70vw] rounded-lg" />
+          <Block className="mt-2 h-4 w-64 max-w-[70vw] rounded-lg" />
         </div>
       </div>
-      <Card className="mb-5 p-4 md:p-5">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+
+      <Card className="mb-5 flex min-h-[187px] items-center p-4 md:p-5">
+        <div className="flex w-full flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center">
             <div className="w-32 shrink-0">
               <Block className="mx-auto h-24 w-24 rounded-3xl" />
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="mb-3 flex flex-wrap items-center gap-2">
+
+            <div className="min-w-0">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Block className="h-9 w-48 rounded-lg" />
                 <Block className="h-6 w-20 rounded-full" />
                 <Block className="h-6 w-16 rounded-full" />
               </div>
-              <Block className="h-5 w-64 max-w-full rounded-lg" />
-              <Block className="mt-4 h-4 w-[34rem] max-w-full rounded-lg" />
+              <div className="flex items-center gap-2">
+                <Block className="h-4 w-4 shrink-0 rounded-md" />
+                <Block className="h-5 w-56 max-w-full rounded-lg" />
+              </div>
+              <Block className="mt-3 h-4 w-[34rem] max-w-full rounded-lg" />
               <Block className="mt-2 h-4 w-80 max-w-full rounded-lg" />
             </div>
           </div>
-          <div className="grid shrink-0 grid-cols-1 gap-2 sm:grid-cols-2 xl:w-[500px]">
-            {Array.from({ length: 4 }, (_, index) => (
+
+          <div
+            className={`grid shrink-0 grid-cols-1 gap-2 ${accountDetailGrid}`}
+          >
+            {Array.from({ length: accountDetailCount }, (_, index) => (
               <div
                 key={index}
-                className="flex min-h-[70px] items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60"
+                className="flex min-h-[70px] min-w-0 items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60"
               >
                 <Block className="mt-0.5 h-4 w-4 shrink-0 rounded-md" />
-                <div className="min-w-0 flex-1 space-y-2">
+                <div className="min-w-0 flex-1">
                   <Block className="h-3 w-20 rounded-md" />
-                  <Block className="h-4 w-28 max-w-full rounded-md" />
+                  <Block className="mt-2 h-4 w-28 max-w-full rounded-md" />
                 </div>
               </div>
             ))}
           </div>
         </div>
       </Card>
+
       <div className="grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <div className="flex h-full flex-col gap-5">
           <Card className="p-5 md:p-6">
             <div className="mb-4 flex items-center gap-3 border-b border-slate-200 pb-3 dark:border-slate-700">
               <Block className="h-11 w-11 shrink-0 rounded-2xl" />
-              <div className="space-y-2">
+              <div>
                 <Block className="h-5 w-44 rounded-lg" />
-                <Block className="h-4 w-40 rounded-lg" />
+                <Block className="mt-2 h-4 w-40 rounded-lg" />
               </div>
             </div>
+
             <div className="space-y-4">
               {Array.from({ length: 2 }, (_, index) => (
-                <div key={index} className="space-y-2">
-                  <Block className="h-3 w-24 rounded-md" />
+                <div key={index}>
+                  <Block className="mb-2 h-3 w-24 rounded-md" />
                   <Block className="h-12 w-full rounded-2xl" />
                 </div>
               ))}
               <Block className="h-10 w-32 rounded-xl" />
             </div>
           </Card>
+
           <Card className="mt-auto p-5 md:p-6">
             <div className="flex items-center justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
                 <Block className="h-11 w-11 shrink-0 rounded-2xl" />
-                <div className="space-y-2">
+                <div>
                   <Block className="h-5 w-32 rounded-lg" />
-                  <Block className="h-4 w-48 max-w-[45vw] rounded-lg" />
+                  <Block className="mt-2 h-4 w-48 max-w-[45vw] rounded-lg" />
                 </div>
               </div>
               <Block className="h-5 w-20 shrink-0 rounded-lg" />
             </div>
           </Card>
         </div>
+
         <Card className="p-5 md:p-6">
           <div className="mb-4 flex items-center gap-3 border-b border-slate-200 pb-3 dark:border-slate-700">
             <Block className="h-11 w-11 shrink-0 rounded-2xl" />
-            <div className="space-y-2">
+            <div>
               <Block className="h-5 w-48 rounded-lg" />
-              <Block className="h-4 w-64 max-w-[55vw] rounded-lg" />
+              <Block className="mt-2 h-4 w-64 max-w-[55vw] rounded-lg" />
             </div>
           </div>
+
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Block className="h-3 w-32 rounded-md" />
+            <div>
+              <Block className="mb-2 h-3 w-32 rounded-md" />
               <Block className="h-12 w-full rounded-2xl" />
             </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               {Array.from({ length: 2 }, (_, index) => (
-                <div key={index} className="space-y-2">
-                  <Block className="h-3 w-36 rounded-md" />
+                <div key={index}>
+                  <Block className="mb-2 h-3 w-36 rounded-md" />
                   <Block className="h-12 w-full rounded-2xl" />
                 </div>
               ))}
             </div>
+
             <div className="grid grid-cols-1 gap-1.5 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60 sm:grid-cols-2">
               {Array.from({ length: 6 }, (_, index) => (
                 <div key={index} className="flex items-center gap-2">
@@ -894,6 +916,7 @@ function ProfileSkeleton() {
                 </div>
               ))}
             </div>
+
             <Block className="h-10 w-40 rounded-xl" />
           </div>
         </Card>
@@ -975,7 +998,7 @@ export default function RouteRefreshSkeleton() {
   else if (kind === 'report-templates') body = <TemplatesSkeleton />;
   else if (kind === 'notifications') body = <NotificationsSkeleton />;
   else if (kind === 'sessions') body = <SessionsSkeleton />;
-  else if (kind === 'profile') body = <ProfileSkeleton />;
+  else if (kind === 'profile') body = <ProfileSkeleton role={role} />;
   else if (kind === 'internops') body = <InternOpsSkeleton />;
   else if (kind === 'department-attendance') body = <Attendance department />;
   else if (kind === 'department-ratings') body = <Ratings department />;
