@@ -383,8 +383,9 @@ export default function DashboardLayout() {
 
   const displayName = me?.full_name || user?.full_name || user?.fullName || '';
   const displayNameReady = Boolean(displayName);
+  const profileAvatar = me ? me.avatar_url : user?.avatar_url;
   const avatarUrl = resolveUploadUrl(
-    me?.avatar_url || (role === 'ADMIN' ? '/admin-default-avatar.svg' : null)
+    profileAvatar || (role === 'ADMIN' ? '/admin-default-avatar.svg' : null)
   );
 
   useEffect(() => {

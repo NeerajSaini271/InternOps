@@ -330,4 +330,87 @@ describe('DashboardLayout Component Tests', () => {
     // Badge should update immediately, with no extra fetch needed.
     expect(await screen.findByText('3')).toBeInTheDocument();
   });
+
+  it('keeps the cached uploaded avatar while the server profile is pending', async () => {
+    let resolveProfile;
+    api.get.mockImplementation((url) => {
+      if (url === '/users/me') {
+        return new Promise((resolve) => {
+          resolveProfile = resolve;
+        });
+      }
+      return Promise.resolve({ data: {} });
+    });
+    useAuthStore.setState({
+      accessToken: 'token',
+      hydrated: true,
+      user: {
+        id: '1',
+        email: 'admin@example.com',
+        role: 'ADMIN',
+        full_name: 'System Admin',
+        avatar_url: '/uploads/cached-avatar.png',
+      },
+    });
+
+    const { container } = renderLayout();
+
+    await waitFor(() => {
+      expect(
+        container.querySelectorAll('img[src$="/uploads/cached-avatar.png"]')
+      ).toHaveLength(2);
+    });
+    expect(
+      container.querySelector('img[src="/admin-default-avatar.svg"]')
+    ).not.toBeInTheDocument();
+
+    resolveProfile({
+      data: {
+        full_name: 'System Admin',
+        avatar_url: '/uploads/server-avatar.png',
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        container.querySelectorAll('img[src$="/uploads/server-avatar.png"]')
+      ).toHaveLength(2);
+    });
+    expect(
+      container.querySelector('img[src$="/uploads/cached-avatar.png"]')
+    ).not.toBeInTheDocument();
+  });
+
+  it('uses the admin default avatar only after the server confirms no upload', async () => {
+    useAuthStore.setState({
+      accessToken: 'token',
+      hydrated: true,
+      user: {
+        id: '1',
+        email: 'admin@example.com',
+        role: 'ADMIN',
+        full_name: 'System Admin',
+        avatar_url: '/uploads/cached-avatar.png',
+      },
+    });
+    api.get.mockImplementation((url) => {
+      if (url === '/users/me') {
+        return Promise.resolve({
+          data: { full_name: 'System Admin', avatar_url: null },
+        });
+      }
+      return Promise.resolve({ data: {} });
+    });
+
+    const { container } = renderLayout();
+
+    await waitFor(() => {
+      expect(
+        container.querySelectorAll('img[src="/admin-default-avatar.svg"]')
+      ).toHaveLength(2);
+    });
+    expect(
+      container.querySelector('img[src$="/uploads/cached-avatar.png"]')
+    ).not.toBeInTheDocument();
+  });
 });
