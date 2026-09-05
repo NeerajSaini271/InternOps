@@ -44,4 +44,17 @@ describe('avatar upload persistence contract', () => {
     expect(source).toContain('.send(fs.createReadStream(filePath))');
     expect(source).toContain("error: 'Unsupported image type'");
   });
+
+  it('configures cross-origin resource policy for static uploads', () => {
+    const source = read('src/app.js');
+    const staticRegistration = source.match(
+      /app\.register\(require\(['"]@fastify\/static['"]\),\s*\{[\s\S]*?prefix:\s*['"]\/uploads\/['"][\s\S]*?\}\);/
+    );
+
+    expect(staticRegistration).not.toBeNull();
+    expect(staticRegistration[0]).toContain('setHeaders:');
+    expect(staticRegistration[0]).toContain(
+      "res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')"
+    );
+  });
 });
