@@ -220,7 +220,10 @@ async function routes(fastify) {
           error: 'Unsupported image type',
         });
       }
-      return reply.type(mimeType).send(fs.createReadStream(filePath));
+      return reply
+        .header('Cross-Origin-Resource-Policy', 'cross-origin')
+        .type(mimeType)
+        .send(fs.createReadStream(filePath));
     }
   );
 
