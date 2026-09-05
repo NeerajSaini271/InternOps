@@ -198,6 +198,9 @@ app.register(require('@fastify/multipart'), {
 app.register(require('@fastify/static'), {
   root: path.join(__dirname, '..', config.uploadDir),
   prefix: '/uploads/',
+  setHeaders: (res) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  },
 });
 
 if (process.env.NODE_ENV !== 'test') {
