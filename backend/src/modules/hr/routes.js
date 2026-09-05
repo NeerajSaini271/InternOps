@@ -1,6 +1,6 @@
 const auth = require('../../middleware/auth');
 const rbac = require('../../middleware/rbac');
-const repo = require('./repository');
+const service = require('./service');
 const { z } = require('zod');
 const querySchema = z.object({
   search: z.string().trim().max(100).optional(),
@@ -33,7 +33,7 @@ async function routes(fastify) {
         return reply
           .status(400)
           .send({ error: 'Invalid HR filters', details: parsed.error.issues });
-      return repo.getDashboard(parsed.data);
+      return service.getDashboard(parsed.data);
     }
   );
 }
