@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, and Profile', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, and Tasks', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -40,6 +40,7 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/Team.jsx'),
       read('src/pages/HR.jsx'),
       read('src/pages/Profile.jsx'),
+      read('src/pages/Tasks.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -298,5 +299,36 @@ describe('refresh loading and route preservation contract', () => {
     );
     expect(coordinator).toContain("loading ? 'hidden'");
     expect(coordinator).toContain('reportLoading(Boolean(loading))');
+  });
+
+  it('keeps the exact Tasks skeleton until initial task data resolves', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const tasks = read('src/pages/Tasks.jsx');
+
+    expect(layout).toContain("'/tasks'");
+    expect(tasks).toContain(
+      "import { useRouteInitialLoading } from '../components/loading/RouteInitialLoading';"
+    );
+    expect(tasks).toContain('useRouteInitialLoading(');
+    expect(tasks).toContain('isLoading || !tasks');
+    expect(tasks).not.toContain('animate-pulse h-48');
+    expect(tasks).not.toContain('{isLoading ? (');
+
+    expect(skeleton).toContain('function Tasks({ department = false })');
+    expect(skeleton).toContain('min-h-[305px] p-5 md:p-6');
+    expect(skeleton).toContain('h-12 w-12 shrink-0 rounded-2xl');
+    expect(skeleton).toContain('h-6 w-20 rounded-full');
+    expect(skeleton).toContain('h-6 w-16 rounded-full');
+    expect(skeleton).toContain('h-7 w-7 rounded-xl');
+    expect(skeleton).toContain('border-t border-slate-200 pt-4');
+    expect(skeleton).toContain('h-10 w-40 rounded-2xl');
+    expect(skeleton).toContain('h-10 w-32 rounded-2xl');
+
+    expect(tasks).toContain('grid grid-cols-1 xl:grid-cols-2 gap-5');
+    expect(tasks).toContain('p-5 md:p-6 card-hover');
+    expect(tasks).toContain('w-12 h-12 rounded-2xl');
+    expect(tasks).toContain('mt-5 pt-4 border-t');
+    expect(tasks).toContain('Details & Analytics');
+    expect(tasks).toContain('View proofs');
   });
 });

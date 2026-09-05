@@ -424,18 +424,43 @@ function Tasks({ department = false }) {
   return (
     <>
       {department && <Context />}
-      <Header />
+      <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+          <div className="space-y-2">
+            <Block className="h-8 w-56 rounded-lg" />
+            <Block className="h-4 w-64 max-w-[70vw] rounded-lg" />
+          </div>
+        </div>
+        <Block className="h-11 w-36 rounded-2xl" />
+      </div>
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-        {Array.from({ length: 4 }, (_, i) => (
-          <Card key={i} className="min-h-[230px] p-5 md:p-6">
-            <div className="flex gap-4">
-              <Block className="h-12 w-12 rounded-2xl" />
-              <div className="flex-1">
-                <Lines count={4} />
+        {Array.from({ length: 4 }, (_, index) => (
+          <Card key={index} className="min-h-[305px] p-5 md:p-6">
+            <div className="flex items-start gap-4">
+              <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Block className="h-6 w-28 rounded-lg" />
+                    <Block className="h-6 w-20 rounded-full" />
+                    <Block className="h-6 w-16 rounded-full" />
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Block className="h-7 w-7 rounded-xl" />
+                    <Block className="h-7 w-7 rounded-xl" />
+                  </div>
+                </div>
+                <Block className="mt-3 h-4 w-40 rounded-lg" />
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <Block className="h-4 w-20 rounded-md" />
+                  <Block className="h-4 w-44 rounded-md" />
+                </div>
               </div>
             </div>
-            <div className="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
-              <Block className="h-10 w-40" />
+            <div className="mt-7 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-4 dark:border-slate-700">
+              <Block className="h-10 w-40 rounded-2xl" />
+              <Block className="h-10 w-32 rounded-2xl" />
             </div>
           </Card>
         ))}
