@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, and Tasks', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, and Notifications', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -41,6 +41,7 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/HR.jsx'),
       read('src/pages/Profile.jsx'),
       read('src/pages/Tasks.jsx'),
+      read('src/pages/Notifications.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -311,11 +312,12 @@ describe('refresh loading and route preservation contract', () => {
     );
     expect(tasks).toContain('useRouteInitialLoading(');
     expect(tasks).toContain('isLoading || !tasks');
+    expect(tasks).toContain('enabled: hydrated && !!accessToken');
     expect(tasks).not.toContain('animate-pulse h-48');
     expect(tasks).not.toContain('{isLoading ? (');
 
     expect(skeleton).toContain('function Tasks({ department = false })');
-    expect(skeleton).toContain('min-h-[305px] p-5 md:p-6');
+    expect(skeleton).toContain('h-[216px] self-start p-5 md:p-6');
     expect(skeleton).toContain('h-12 w-12 shrink-0 rounded-2xl');
     expect(skeleton).toContain('h-6 w-20 rounded-full');
     expect(skeleton).toContain('h-6 w-16 rounded-full');
@@ -330,5 +332,21 @@ describe('refresh loading and route preservation contract', () => {
     expect(tasks).toContain('mt-5 pt-4 border-t');
     expect(tasks).toContain('Details & Analytics');
     expect(tasks).toContain('View proofs');
+  });
+
+  it('keeps the Notifications skeleton until notification data resolves', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const notifications = read('src/pages/Notifications.jsx');
+
+    expect(layout).toContain("'/notifications'");
+    expect(notifications).toContain('useRouteInitialLoading(');
+    expect(notifications).toContain('enabled: hydrated && !!accessToken');
+    expect(notifications).not.toContain('<Spinner />');
+    expect(skeleton).toContain('function NotificationsSkeleton()');
+    expect(skeleton).toContain('min-h-[145px] p-5');
+    expect(skeleton).toContain('h-11 w-11 shrink-0 rounded-2xl');
+    expect(skeleton).toContain('space-y-3');
+    expect(skeleton).toContain('h-5 w-24 rounded-md');
+    expect(skeleton).toContain('h-8 w-8 rounded-xl');
   });
 });

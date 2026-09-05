@@ -128,6 +128,7 @@ export default function Tasks({
           params: { department_id: activeDeptId || undefined },
         })
         .then((res) => res.data),
+    enabled: hydrated && !!accessToken,
     retry: 1,
   });
 

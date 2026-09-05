@@ -432,11 +432,11 @@ function Tasks({ department = false }) {
             <Block className="h-4 w-64 max-w-[70vw] rounded-lg" />
           </div>
         </div>
-        <Block className="h-11 w-36 rounded-2xl" />
+        <Block className="mt-3.5 h-11 w-36 rounded-2xl" />
       </div>
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+      <div className="mt-9 grid grid-cols-1 items-start gap-5 xl:grid-cols-2">
         {Array.from({ length: 4 }, (_, index) => (
-          <Card key={index} className="min-h-[305px] p-5 md:p-6">
+          <Card key={index} className="h-[216px] self-start p-5 md:p-6">
             <div className="flex items-start gap-4">
               <Block className="h-12 w-12 shrink-0 rounded-2xl" />
               <div className="min-w-0 flex-1">
@@ -458,7 +458,7 @@ function Tasks({ department = false }) {
                 </div>
               </div>
             </div>
-            <div className="mt-7 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-4 dark:border-slate-700">
+            <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-4 dark:border-slate-700">
               <Block className="h-10 w-40 rounded-2xl" />
               <Block className="h-10 w-32 rounded-2xl" />
             </div>
@@ -731,14 +731,36 @@ function TemplatesSkeleton() {
 function NotificationsSkeleton() {
   return (
     <>
-      <Header actions={2} />
+      <div className="mb-[27px] flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+          <div>
+            {/* Activity Center */}
+            <Block className="mt-1 mb-4 h-4 w-[168px] rounded-md" />
+            {/* Notifications */}
+            <Block className="h-9 w-[220px] rounded-lg" />
+            {/* 4 unread activity updates */}
+            <Block className="mt-4 h-5 w-[195px] rounded-md" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Block className="h-[42px] w-[125px] shrink-0 rounded-2xl" />
+          <Block className="h-[42px] w-[147px] shrink-0 rounded-2xl" />
+        </div>
+      </div>
       <div className="space-y-3">
-        {Array.from({ length: 6 }, (_, i) => (
-          <Card key={i} className="min-h-28 p-5">
-            <div className="flex gap-4">
-              <Block className="h-11 w-11" />
-              <div className="flex-1">
-                <Lines count={3} />
+        {Array.from({ length: 5 }, (_, index) => (
+          <Card key={index} className="min-h-[145px] p-5">
+            <div className="flex items-start gap-4">
+              <Block className="h-11 w-11 shrink-0 rounded-2xl" />
+              <div className="min-w-0 flex-1 pt-0.5">
+                <Block className="h-5 w-52 rounded-md" />
+                <Block className="mt-2 h-4 w-[34rem] max-w-full rounded-md" />
+                <Block className="mt-3 h-3 w-20 rounded-md" />
+              </div>
+              <div className="flex shrink-0 items-center gap-2 pt-1">
+                <Block className="h-5 w-24 rounded-md" />
+                <Block className="h-8 w-8 rounded-xl" />
               </div>
             </div>
           </Card>

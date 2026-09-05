@@ -223,6 +223,7 @@ const COORDINATED_LOADING_ROUTES = new Set([
   '/hr',
   '/profile',
   '/tasks',
+  '/notifications',
 ]);
 
 function canShowNavItem(item, role, flags, flagsLoaded) {
