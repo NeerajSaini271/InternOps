@@ -131,6 +131,13 @@ async function routes(fastify) {
         });
 
         await repo.updateAvatarUrl(req.user.id, url);
+        await repo.saveImageMetadata(
+          req.user.id,
+          fileName,
+          url,
+          detectedMime,
+          buffer.length
+        );
       } catch (err) {
         // Remove the uploaded file if database persistence fails.
         try {
@@ -146,14 +153,6 @@ async function routes(fastify) {
 
         throw err;
       }
-
-      await repo.saveImageMetadata(
-        req.user.id,
-        fileName,
-        url,
-        detectedMime,
-        buffer.length
-      );
 
       return {
         success: true,
