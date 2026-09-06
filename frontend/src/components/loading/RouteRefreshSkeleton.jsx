@@ -8,6 +8,7 @@ const PULSE_CYCLE_MS = 2000;
 const routeLoadingStartedAt = new Map();
 const shell =
   'border border-slate-200/90 dark:border-slate-700 bg-gradient-to-br from-white via-white to-slate-50/80 dark:bg-none dark:bg-slate-900';
+const statusWidths = ['w-[75px]', 'w-[65px]', 'w-[120px]', 'w-[100px]'];
 function Block({ className = '' }) {
   return (
     <div
@@ -937,29 +938,91 @@ function ProfileSkeleton({ role }) {
   );
 }
 function InternOpsSkeleton() {
+  const columns = '31% 25% 19% 20% 5%';
   return (
     <>
-      <PageHeading compact />
-      <div className="mb-7 grid gap-6 lg:grid-cols-3">
-        <Card className="h-32 p-5 lg:col-span-2">
-          <Lines count={4} />
+      <div className="mb-8 flex items-center gap-4">
+        <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+        <div>
+          <Block className="h-10 w-[250px] rounded-lg" />
+          <Block className="mt-2 h-5 w-[560px] max-w-[72vw] rounded-lg" />
+        </div>
+      </div>
+      <div className="mb-7 grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+        <Card className="h-[138px] p-5 lg:col-span-2">
+          <Block className="mb-4 h-4 w-48 rounded-md" />
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
+            <div className="flex flex-1 items-center gap-2">
+              <Block className="h-11 flex-1 rounded-xl" />
+              <Block className="h-4 w-5 rounded-md" />
+              <Block className="h-11 flex-1 rounded-xl" />
+            </div>
+            <div className="flex flex-wrap justify-end gap-1.5">
+              {Array.from({ length: 5 }, (_, index) => (
+                <Block key={index} className="h-9 w-24 rounded-lg" />
+              ))}
+            </div>
+          </div>
         </Card>
-        <Card className="h-32 p-5">
-          <Lines count={4} />
+        <Card className="h-[110px] p-5">
+          <Block className="mb-4 h-4 w-32 rounded-md" />
+          <Block className="h-11 w-full rounded-xl" />
         </Card>
       </div>
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <TableShape cols={5} rows={7} />
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-3">
+        <div className="space-y-4 xl:col-span-2">
+          <div className="flex w-fit gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1 dark:border-slate-700 dark:bg-slate-800/70">
+            {statusWidths.map((width, index) => (
+              <Block key={index} className={`h-[30px] ${width} rounded-lg`} />
+            ))}
+          </div>
+          <Card>
+            <div
+              className="grid min-h-[55px] items-center border-b border-slate-200 bg-slate-50/80 px-4 dark:border-slate-700 dark:bg-slate-800/70"
+              style={{ gridTemplateColumns: columns }}
+            >
+              {Array.from({ length: 5 }, (_, index) => (
+                <Block
+                  key={index}
+                  className={`h-4 rounded-md ${index === 0 ? 'w-40' : index === 4 ? 'mx-auto w-4' : 'mx-auto w-24'}`}
+                />
+              ))}
+            </div>
+            {Array.from({ length: 5 }, (_, row) => (
+              <div
+                key={row}
+                className="grid min-h-[74px] items-center border-b border-slate-100 px-4 last:border-0 dark:border-slate-800"
+                style={{ gridTemplateColumns: columns }}
+              >
+                <div className="space-y-2">
+                  <Block className="h-5 w-40 rounded-md" />
+                  <Block className="h-4 w-52 max-w-full rounded-md" />
+                </div>
+                <div className="mx-auto flex items-center gap-2">
+                  <Block className="h-2 w-20 rounded-full" />
+                  <Block className="h-5 w-12 rounded-md" />
+                </div>
+                <div className="mx-auto flex items-center gap-2">
+                  <Block className="h-5 w-10 rounded-md" />
+                  <Block className="h-4 w-20 rounded-md" />
+                </div>
+                <Block className="mx-auto h-8 w-28 rounded-full" />
+                <Block className="mx-auto h-5 w-4 rounded-md" />
+              </div>
+            ))}
+          </Card>
         </div>
-        <Card className="min-h-96 p-6">
-          <Lines count={10} />
+        <Card className="flex min-h-[310px] items-center justify-center border-dashed p-12">
+          <div className="w-full space-y-4">
+            <Block className="mx-auto h-12 w-12 rounded-2xl" />
+            <Block className="mx-auto h-5 w-72 max-w-full rounded-md" />
+            <Block className="mx-auto h-5 w-60 max-w-full rounded-md" />
+          </div>
         </Card>
       </div>
     </>
   );
 }
-
 export function routeKind(path) {
   if (/^\/(?:admin\/)?tasks\/[^/]+$/.test(path)) return 'task-detail';
   if (/^\/departments\/[^/]+\/projects\/[^/]+$/.test(path))

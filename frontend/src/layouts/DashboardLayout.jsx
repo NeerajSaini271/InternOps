@@ -225,6 +225,7 @@ const COORDINATED_LOADING_ROUTES = new Set([
   '/tasks',
   '/notifications',
   '/sessions',
+  '/internops',
 ]);
 
 function canShowNavItem(item, role, flags, flagsLoaded) {

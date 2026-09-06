@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, and Sessions', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -43,6 +43,7 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/Tasks.jsx'),
       read('src/pages/Notifications.jsx'),
       read('src/pages/Sessions.jsx'),
+      read('src/pages/InternOps.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -384,5 +385,22 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).toContain('h-[90px] px-4 py-3');
     expect(skeleton).toContain('h-[36px] w-[82px]');
     expect(skeleton).toContain('h-[42px] w-[166px]');
+  });
+
+  it('coordinates InternOps loading and aligns the performance table', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const internops = read('src/pages/InternOps.jsx');
+
+    expect(layout).toContain("'/internops'");
+    expect(internops).toContain('useRouteInitialLoading(');
+    expect(internops).not.toContain(
+      '<Spinner label="Loading intern records..." />'
+    );
+    expect(internops).not.toContain('bg-slate-55');
+    expect(internops).toContain('bg-slate-50/80');
+    expect(internops).toContain('<colgroup>');
+    expect(internops).toContain('justify-center gap-1.5 font-bold');
+    expect(skeleton).toContain("const columns = '31% 25% 19% 20% 5%'");
+    expect(skeleton).toContain('function InternOpsSkeleton()');
   });
 });
