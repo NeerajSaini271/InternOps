@@ -226,6 +226,7 @@ const COORDINATED_LOADING_ROUTES = new Set([
   '/notifications',
   '/sessions',
   '/internops',
+  '/performance-intelligence',
 ]);
 
 function canShowNavItem(item, role, flags, flagsLoaded) {
@@ -258,9 +259,13 @@ const NavLink = memo(({ n, active, collapsed, onLinkClick }) => {
         }`}
     >
       <Icon className="w-5 h-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-      {!collapsed && <span className="whitespace-nowrap">{n.label}</span>}
+      {!collapsed && (
+        <span className="min-w-0 flex-1 truncate whitespace-nowrap">
+          {n.label}
+        </span>
+      )}
       {!collapsed && active && (
-        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-600" />
+        <span className="ml-2 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-600" />
       )}
       {collapsed && active && (
         <span className="absolute right-1.5 w-1.5 h-6 rounded-full bg-white/80" />

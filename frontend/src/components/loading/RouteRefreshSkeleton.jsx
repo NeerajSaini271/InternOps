@@ -937,6 +937,102 @@ function ProfileSkeleton({ role }) {
     </>
   );
 }
+function PerformanceIntelligenceSkeleton() {
+  const tabWidths = ['w-[160px]', 'w-[205px]', 'w-[114px]', 'w-[215px]'];
+  return (
+    <div className="min-h-[calc(100vh-7rem)] rounded-3xl bg-white p-4 text-slate-900 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 md:p-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 dark:border-slate-800 md:flex-row md:items-center">
+          <div>
+            <div className="flex items-center gap-2">
+              <Block className="mt-1 h-6 w-6 shrink-0 rounded-md" />
+              <Block className="mt-1 h-8 w-[370px] max-w-[68vw] rounded-lg" />
+            </div>
+            <Block className="mt-3 h-5 w-[680px] max-w-[76vw] rounded-md" />
+          </div>
+          <Block className=" h-[42px] w-[190px] shrink-0 rounded-lg" />
+        </div>
+
+        <div className="!mt-6 flex gap-6 overflow-x-auto border-b border-slate-200 dark:border-slate-800">
+          {tabWidths.map((width, index) => (
+            <div
+              key={width}
+              className={`border-b-2 pb-3 ${
+                index === 0 ? 'border-indigo-500' : 'border-transparent'
+              }`}
+            >
+              <Block className={`h-5 ${width} shrink-0 rounded-md`} />
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-6">
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div className="h-[192px] relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-500 dark:!bg-slate-900 dark:shadow-lg dark:shadow-black/20">
+              <div className="flex items-center justify-between">
+                <Block className="h-4 w-44 rounded-md" />
+                <Block className="h-5 w-5 rounded-md" />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <Block className="h-12 w-28 rounded-lg" />
+                <Block className="h-5 w-12 rounded-md" />
+              </div>
+              <div className="mt-2 flex items-center gap-2">
+                <Block className="h-6 w-14 rounded-md" />
+                <Block className="h-4 w-20 rounded-md" />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-500 dark:!bg-slate-900 dark:shadow-lg dark:shadow-black/20">
+              <div className="flex items-center justify-between">
+                <Block className="h-4 w-40 rounded-md" />
+                <Block className="h-5 w-5 rounded-md" />
+              </div>
+              <Block className="mt-4 h-7 w-36 rounded-full" />
+              <Block className="mt-2 h-4 w-44 max-w-full rounded-md" />
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-500 dark:!bg-slate-900 dark:shadow-lg dark:shadow-black/20">
+              <div className="flex items-center justify-between">
+                <Block className="h-4 w-40 rounded-md" />
+                <Block className="h-5 w-5 rounded-md" />
+              </div>
+              <Block className="mt-3 h-10 w-24 rounded-lg" />
+              <Block className="mt-2 h-4 w-32 rounded-md" />
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-500 dark:!bg-slate-900 dark:shadow-lg dark:shadow-black/20">
+              <div className="flex items-center justify-between">
+                <Block className="h-4 w-32 rounded-md" />
+                <Block className="h-5 w-5 rounded-md" />
+              </div>
+              <Block className="mt-3 h-10 w-32 rounded-lg" />
+              <Block className="mt-2 h-4 w-32 rounded-md" />
+            </div>
+          </div>
+
+          <div className="h-[236px] rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-950">
+            <div className="mb-4 flex items-center gap-2">
+              <Block className="h-5 w-5 rounded-md" />
+              <Block className="h-7 w-[310px] rounded-lg" />
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {Array.from({ length: 9 }, (_, index) => (
+                <div key={index} className="space-y-1.5">
+                  <div className="flex justify-between">
+                    <Block className="h-4 w-32 rounded-md" />
+                    <Block className="h-4 w-12 rounded-md" />
+                  </div>
+                  <Block className="h-2 w-full rounded-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function InternOpsSkeleton() {
   const columns = '31% 25% 19% 20% 5%';
   return (
@@ -1075,6 +1171,8 @@ export default function RouteRefreshSkeleton() {
   else if (kind === 'sessions') body = <SessionsSkeleton />;
   else if (kind === 'profile') body = <ProfileSkeleton role={role} />;
   else if (kind === 'internops') body = <InternOpsSkeleton />;
+  else if (kind === 'performance-intelligence')
+    body = <PerformanceIntelligenceSkeleton />;
   else if (kind === 'department-attendance') body = <Attendance department />;
   else if (kind === 'department-ratings') body = <Ratings department />;
   else if (kind === 'department-tasks') body = <Tasks department />;

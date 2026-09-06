@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -44,6 +44,7 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/Notifications.jsx'),
       read('src/pages/Sessions.jsx'),
       read('src/pages/InternOps.jsx'),
+      read('src/pages/PerformanceIntelligence.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -402,5 +403,19 @@ describe('refresh loading and route preservation contract', () => {
     expect(internops).toContain('justify-center gap-1.5 font-bold');
     expect(skeleton).toContain("const columns = '31% 25% 19% 20% 5%'");
     expect(skeleton).toContain('function InternOpsSkeleton()');
+  });
+  it('coordinates AI Performance Review loading and project theming', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const page = read('src/pages/PerformanceIntelligence.jsx');
+    expect(layout).toContain("'/performance-intelligence'");
+    expect(layout).toContain('min-w-0 flex-1 truncate whitespace-nowrap');
+    expect(layout).toContain('h-1.5 w-1.5 shrink-0');
+    expect(page).toContain('useRouteInitialLoading(loading && !review)');
+    expect(page).not.toContain('Analyzing intern performance signals...');
+    expect(page).toContain('bg-white');
+    expect(page).toContain('dark:bg-slate-950');
+    expect(skeleton).toContain('function PerformanceIntelligenceSkeleton()');
+    expect(skeleton).toContain("kind === 'performance-intelligence'");
+    expect(skeleton).toContain('md:grid-cols-4');
   });
 });
