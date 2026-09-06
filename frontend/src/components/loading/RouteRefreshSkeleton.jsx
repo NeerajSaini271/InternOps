@@ -794,7 +794,7 @@ function ReportsSkeleton() {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <Card className="p-5">
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-5 flex items-center gap-2">
             <Block className="h-5 w-5 shrink-0 rounded-md" />
             <Block className="h-6 w-48 rounded-md" />
           </div>
@@ -815,7 +815,7 @@ function ReportsSkeleton() {
         </Card>
 
         <Card className="p-5">
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-5 flex items-center gap-2">
             <Block className="h-5 w-5 shrink-0 rounded-md" />
             <Block className="h-6 w-40 rounded-md" />
           </div>
@@ -839,7 +839,7 @@ function ReportsSkeleton() {
         </Card>
 
         <Card className="p-5 md:col-span-2">
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-5 flex items-center gap-2">
             <Block className="h-5 w-5 shrink-0 rounded-md" />
             <Block className="h-6 w-44 rounded-md" />
           </div>
@@ -940,6 +940,78 @@ function TemplatesSkeleton() {
         ))}
       </div>
     </>
+  );
+}
+
+function NoticeBlock({ className = '' }) {
+  return (
+    <Block className={`!animate-[pulse_2s_linear_infinite] ${className}`} />
+  );
+}
+function NoticesSkeleton() {
+  return (
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8 flex items-center gap-4">
+        <NoticeBlock className="h-12 w-12 shrink-0 rounded-2xl" />
+
+        <div>
+          <NoticeBlock className="h-10 w-[230px] max-w-[62vw] rounded-lg" />
+          <NoticeBlock className="mt-4 h-5 w-[330px] max-w-[72vw] rounded-md" />
+        </div>
+      </div>
+
+      <Card className="mb-6 flex h-[467px] items-center border border-slate-200 p-5 dark:border-slate-700 dark:!bg-slate-800">
+        <div className="w-full translate-y-1">
+          <div className="mb-5 flex items-center gap-2">
+            <NoticeBlock className="h-4 w-4 rounded-md" />
+            <NoticeBlock className="h-7 w-[170px] rounded-lg" />
+          </div>
+
+          <NoticeBlock className="h-[36px] w-[280px] max-w-full rounded-lg border border-dashed border-slate-300 dark:border-slate-600" />
+
+          <NoticeBlock className="mt-5 h-[46px] w-full rounded-2xl" />
+
+          <NoticeBlock className="mt-3 h-[96px] w-full rounded-2xl" />
+
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <NoticeBlock className="h-[46px] w-full rounded-2xl" />
+            <NoticeBlock className="h-[46px] w-full rounded-2xl" />
+          </div>
+
+          <div className="mt-4 flex items-center gap-2">
+            <NoticeBlock className="h-4 w-4 rounded-md" />
+            <NoticeBlock className="h-4 w-[170px] rounded-md" />
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <NoticeBlock className="h-[46px] w-full rounded-2xl sm:w-72" />
+            <NoticeBlock className="h-[46px] w-[180px] rounded-2xl" />
+          </div>
+        </div>
+      </Card>
+
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 3 }, (_, index) => (
+          <Card key={index} className="p-4 dark:!bg-slate-800 md:p-5">
+            <div className="flex items-center gap-4">
+              <NoticeBlock className="h-20 w-32 shrink-0 rounded-xl" />
+
+              <div className="min-w-0 flex-1">
+                <NoticeBlock className="h-6 w-24 rounded-full" />
+                <NoticeBlock className="mt-2 h-6 w-[240px] rounded-md" />
+                <NoticeBlock className="mt-2 h-4 w-[520px] max-w-full rounded-md" />
+              </div>
+
+              <div className="flex shrink-0 gap-1">
+                <NoticeBlock className="h-8 w-8 rounded-lg" />
+                <NoticeBlock className="h-8 w-8 rounded-lg" />
+                <NoticeBlock className="h-8 w-8 rounded-lg" />
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 }
 function NotificationsSkeleton() {
@@ -1381,6 +1453,7 @@ export default function RouteRefreshSkeleton() {
   else if (kind === 'reports') body = <ReportsSkeleton />;
   else if (kind === 'report-templates') body = <TemplatesSkeleton />;
   else if (kind === 'exports') body = <ExportsSkeleton />;
+  else if (kind === 'notices') body = <NoticesSkeleton />;
   else if (kind === 'notifications') body = <NotificationsSkeleton />;
   else if (kind === 'sessions') body = <SessionsSkeleton />;
   else if (kind === 'profile') body = <ProfileSkeleton role={role} />;

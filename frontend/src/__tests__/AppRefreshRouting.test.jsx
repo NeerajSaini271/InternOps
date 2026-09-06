@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, and Report Templates, and Exports', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, and Report Templates, and Exports, and Notice Board', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -48,6 +48,7 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/admin/Reports.jsx'),
       read('src/pages/admin/ReportTemplates.jsx'),
       read('src/pages/admin/Exports.jsx'),
+      read('src/pages/admin/Notices.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -450,5 +451,23 @@ describe('refresh loading and route preservation contract', () => {
       'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3'
     );
     expect(skeleton).toContain('min-h-[260px]');
+  });
+
+  it('coordinates Notice Board loading, validation, and exact form skeleton', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const notices = read('src/pages/admin/Notices.jsx');
+    const routes = read('../backend/src/modules/notices/routes.js');
+    const repository = read('../backend/src/modules/notices/repository.js');
+    expect(layout).toContain("'/notices'");
+    expect(notices).toContain(
+      'useRouteInitialLoading(isLoading && !noticesData)'
+    );
+    expect(notices).toContain('if (imageUrl) payload.image_url = imageUrl');
+    expect(notices).not.toContain('image_url: image_url || null');
+    expect(routes).not.toContain('.nullable()');
+    expect(repository).toContain('createdBy,');
+    expect(skeleton).toContain('function NoticesSkeleton()');
+    expect(skeleton).toContain("kind === 'notices'");
+    expect(skeleton).toContain('h-[124px] w-full rounded-2xl');
   });
 });

@@ -230,6 +230,7 @@ const COORDINATED_LOADING_ROUTES = new Set([
   '/reports',
   '/report-templates',
   '/exports',
+  '/notices',
 ]);
 
 function canShowNavItem(item, role, flags, flagsLoaded) {
