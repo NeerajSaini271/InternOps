@@ -468,6 +468,6 @@ describe('refresh loading and route preservation contract', () => {
     expect(repository).toContain('createdBy,');
     expect(skeleton).toContain('function NoticesSkeleton()');
     expect(skeleton).toContain("kind === 'notices'");
-    expect(skeleton).toContain('h-[124px] w-full rounded-2xl');
+    expect(skeleton).toContain('h-[96px] w-full rounded-2xl');
   });
 });
