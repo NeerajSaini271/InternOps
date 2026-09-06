@@ -690,6 +690,88 @@ function Generic({ cols = 5 }) {
   );
 }
 
+function ExportsSkeleton() {
+  return (
+    <>
+      <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+          <div>
+            <Block className="mb-3 h-4 w-20 rounded-md" />
+            <Block className="h-12 w-[260px] rounded-lg" />
+            <Block className="mt-3 h-5 w-[480px] max-w-[72vw] rounded-md" />
+          </div>
+        </div>
+      </div>
+
+      <Card className="mb-7 h-[210px] border border-slate-200 p-6 dark:border-slate-700 md:p-7">
+        <div className="mb-5 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3">
+            <Block className="h-11 w-11 shrink-0 rounded-2xl" />
+            <div>
+              <Block className="h-7 w-36 rounded-lg" />
+              <Block className="mt-1 h-5 w-[340px] max-w-[68vw] rounded-md" />
+            </div>
+          </div>
+          <Block className="h-8 w-[112px] rounded-full" />
+        </div>
+        <Block className="mb-2 h-4 w-[150px] rounded-md" />
+        <Block className="h-[51px] w-full rounded-2xl" />
+      </Card>
+
+      <Card className="mb-7 h-[210px] border border-slate-200 p-6 dark:border-slate-700 md:p-7">
+        <div className="mb-5 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3">
+            <Block className="h-11 w-11 shrink-0 rounded-2xl" />
+            <div>
+              <Block className="h-7 w-36 rounded-lg" />
+              <Block className="mt-1 h-5 w-[410px] max-w-[68vw] rounded-md" />
+            </div>
+          </div>
+          <Block className="h-8 w-[112px] rounded-full" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {Array.from({ length: 2 }, (_, index) => (
+            <div key={index}>
+              <Block className="mb-2 h-4 w-14 rounded-md" />
+              <Block className="h-[51px] w-full rounded-2xl" />
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 3 }, (_, index) => (
+          <Card
+            key={index}
+            className="min-h-[260px] border border-slate-200 p-6 dark:border-slate-700 md:p-7"
+          >
+            <div className="flex h-full flex-col justify-between">
+              <div>
+                <Block className="mb-6 h-16 w-16 rounded-3xl" />
+                <Block
+                  className={`h-8 rounded-lg ${
+                    index === 0
+                      ? 'w-[210px]'
+                      : index === 1
+                        ? 'w-[170px]'
+                        : 'w-[150px]'
+                  }`}
+                />
+                <Block className="mt-2 h-5 w-[190px] rounded-md" />
+              </div>
+              <Block
+                className={`mt-7 h-[42px] rounded-2xl ${
+                  index === 2 ? 'w-[112px]' : 'w-[178px]'
+                }`}
+              />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </>
+  );
+}
 function ReportsSkeleton() {
   return (
     <>
@@ -1298,6 +1380,7 @@ export default function RouteRefreshSkeleton() {
   else if (kind === 'analytics') body = <Analytics />;
   else if (kind === 'reports') body = <ReportsSkeleton />;
   else if (kind === 'report-templates') body = <TemplatesSkeleton />;
+  else if (kind === 'exports') body = <ExportsSkeleton />;
   else if (kind === 'notifications') body = <NotificationsSkeleton />;
   else if (kind === 'sessions') body = <SessionsSkeleton />;
   else if (kind === 'profile') body = <ProfileSkeleton role={role} />;

@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, and Report Templates', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, and Report Templates, and Exports', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -47,6 +47,7 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/PerformanceIntelligence.jsx'),
       read('src/pages/admin/Reports.jsx'),
       read('src/pages/admin/ReportTemplates.jsx'),
+      read('src/pages/admin/Exports.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -433,5 +434,21 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).toContain('h-[38px] w-[154px]');
     expect(skeleton).toContain('grid grid-cols-1 gap-5 xl:grid-cols-2');
     expect(skeleton).toContain('actionWidths.map');
+  });
+
+  it('coordinates Exports loading and exact export workspace skeleton', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const exportsPage = read('src/pages/admin/Exports.jsx');
+    expect(layout).toContain("'/exports'");
+    expect(exportsPage).toContain('useRouteInitialLoading(departmentsLoading)');
+    expect(exportsPage).toContain('setDepartmentsLoading(false)');
+    expect(exportsPage).not.toContain('<div className="animate-fade-in-up">');
+    expect(skeleton).toContain('function ExportsSkeleton()');
+    expect(skeleton).toContain("kind === 'exports'");
+    expect(skeleton).toContain('grid grid-cols-1 gap-4 md:grid-cols-2');
+    expect(skeleton).toContain(
+      'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3'
+    );
+    expect(skeleton).toContain('min-h-[260px]');
   });
 });
