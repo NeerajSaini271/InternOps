@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, and Notifications', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, and Sessions', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -42,6 +42,7 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/Profile.jsx'),
       read('src/pages/Tasks.jsx'),
       read('src/pages/Notifications.jsx'),
+      read('src/pages/Sessions.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -367,5 +368,21 @@ describe('refresh loading and route preservation contract', () => {
     expect(profile).toContain('sm:grid-cols-2 xl:w-[500px]');
     expect(profile).toContain('h-24 w-24 rounded-3xl');
     expect(profile).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]');
+  });
+
+  it('keeps the Sessions skeleton until session data resolves', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const sessions = read('src/pages/Sessions.jsx');
+
+    expect(layout).toContain("'/sessions'");
+    expect(sessions).toContain('useRouteInitialLoading(');
+    expect(sessions).toContain('enabled: hydrated && !!accessToken');
+    expect(sessions).not.toContain('<Spinner />');
+    expect(skeleton).toContain('function SessionsSkeleton()');
+    expect(skeleton).toContain('grid grid-cols-1 gap-3 md:grid-cols-2');
+    expect(skeleton).toContain('h-11 w-11 shrink-0 rounded-xl');
+    expect(skeleton).toContain('h-[90px] px-4 py-3');
+    expect(skeleton).toContain('h-[36px] w-[82px]');
+    expect(skeleton).toContain('h-[42px] w-[166px]');
   });
 });

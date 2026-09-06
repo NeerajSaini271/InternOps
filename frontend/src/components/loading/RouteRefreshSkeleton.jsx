@@ -772,16 +772,28 @@ function NotificationsSkeleton() {
 function SessionsSkeleton() {
   return (
     <>
-      <PageHeading action compact />
+      <div className="mb-[33px] flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Block className="mt-1 h-12 w-12 shrink-0 rounded-2xl" />
+          <div>
+            <Block className="h-10 w-[264px] max-w-[62vw] rounded-lg" />
+            <Block className="mt-2 h-5 w-[468px] max-w-[70vw] rounded-lg" />
+          </div>
+        </div>
+        <Block className="-mt-[26px] h-[42px] w-[166px] shrink-0 rounded-2xl" />
+      </div>
+
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {Array.from({ length: 4 }, (_, i) => (
-          <Card key={i} className="h-28 p-4">
-            <div className="flex gap-3">
-              <Block className="h-11 w-11" />
-              <div className="flex-1">
-                <Lines count={3} />
+        {Array.from({ length: 2 }, (_, index) => (
+          <Card key={index} className="h-[90px] px-4 py-3">
+            <div className="flex h-full items-center gap-3">
+              <Block className="h-11 w-11 shrink-0 rounded-xl" />
+              <div className="min-w-0 flex-1">
+                <Block className="h-5 w-24 rounded-md" />
+                <Block className="mt-2 h-4 w-52 max-w-full rounded-md" />
+                <Block className="mt-2 h-4 w-36 max-w-full rounded-md" />
               </div>
-              <Block className="h-10 w-24" />
+              <Block className="h-[36px] w-[82px] shrink-0 rounded-2xl" />
             </div>
           </Card>
         ))}
