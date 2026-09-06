@@ -32,10 +32,11 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, and Report Templates, and Exports, and Notice Board', () => {
+  it('centralizes initial loading for User Directory, Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, Report Templates, Exports, and Notice Board', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
+      read('src/pages/admin/AdminDashboard.jsx'),
       read('src/pages/Home.jsx'),
       read('src/pages/Team.jsx'),
       read('src/pages/HR.jsx'),
@@ -453,6 +454,19 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).toContain('min-h-[260px]');
   });
 
+  it('coordinates User Directory loading and matches its exact workspace skeleton', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const users = read('src/pages/admin/AdminDashboard.jsx');
+    expect(layout).toContain("'/admin'");
+    expect(users).toContain('useRouteInitialLoading(isLoading && !data)');
+    expect(users).not.toContain('{isLoading ? (');
+    expect(skeleton).toContain('function AdminUsersSkeleton()');
+    expect(skeleton).toContain("kind === 'admin'");
+    expect(skeleton).toContain("const columns = '42% 15% 20% 13% 10%'");
+    expect(skeleton).toContain('h-[51px] min-w-[240px] flex-1 rounded-2xl');
+    expect(skeleton).toContain('min-h-[88px]');
+    expect(skeleton).toContain('Array.from({ length: 6 }');
+  });
   it('coordinates Notice Board loading, validation, and exact form skeleton', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const notices = read('src/pages/admin/Notices.jsx');

@@ -948,6 +948,83 @@ function NoticeBlock({ className = '' }) {
     <Block className={`!animate-[pulse_2s_linear_infinite] ${className}`} />
   );
 }
+function AdminUsersSkeleton() {
+  const columns = '42% 15% 20% 13% 10%';
+  return (
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-[30px] flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-4">
+          <Block className="h-14 w-14 shrink-0 rounded-3xl" />
+          <div>
+            <Block className="mb-2 h-3 w-28 rounded-md" />
+            <Block className="h-12 w-[300px] max-w-[62vw] rounded-xl" />
+            <Block className="mt-3 h-5 w-[430px] max-w-[72vw] rounded-md" />
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 lg:translate-y-1">
+          <Block className="h-10 w-[156px] rounded-lg" />
+          <Block className="h-10 w-[104px] rounded-lg" />
+          <Block className="h-10 w-[104px] rounded-lg" />
+        </div>
+      </div>
+
+      <Card className="mb-6 h-[175px] p-5 md:p-6">
+        <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3">
+            <Block className="h-11 w-11 shrink-0 rounded-2xl" />
+            <div>
+              <Block className="h-7 w-[180px] rounded-lg" />
+              <Block className="mt-2 h-4 w-[430px] max-w-[68vw] rounded-md" />
+            </div>
+          </div>
+          <Block className="h-8 w-[104px] rounded-full" />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Block className="h-[51px] min-w-[240px] flex-1 rounded-2xl" />
+          <Block className="h-[51px] w-full rounded-2xl sm:w-44" />
+          <Block className="h-[51px] w-full rounded-2xl sm:w-52" />
+          <Block className="h-[51px] w-full rounded-2xl sm:w-48" />
+        </div>
+      </Card>
+
+      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white dark:border-slate-600 dark:bg-slate-900">
+        <div
+          className="grid min-h-[56px] items-center border-b border-slate-200 bg-slate-50 px-6 dark:border-slate-600 dark:bg-slate-950"
+          style={{ gridTemplateColumns: columns }}
+        >
+          <Block className="h-5 w-16 rounded-md" />
+          <Block className="mx-auto h-5 w-14 rounded-md" />
+          <Block className="mx-auto h-5 w-24 rounded-md" />
+          <Block className="mx-auto h-5 w-16 rounded-md" />
+          <Block className="ml-auto h-5 w-16 rounded-md" />
+        </div>
+        {Array.from({ length: 6 }, (_, row) => (
+          <div
+            key={row}
+            className={`grid min-h-[88px] items-center border-b border-slate-100 px-6 last:border-0 dark:border-slate-700 ${
+              row % 2 === 0
+                ? 'bg-white dark:bg-slate-900'
+                : 'bg-slate-50/50 dark:bg-slate-800/40'
+            }`}
+            style={{ gridTemplateColumns: columns }}
+          >
+            <div className="flex min-w-0 items-center gap-4">
+              <Block className="h-11 w-11 shrink-0 rounded-2xl" />
+              <div className="min-w-0 flex-1">
+                <Block className="h-5 w-40 max-w-full rounded-md" />
+                <Block className="mt-2 h-4 w-52 max-w-full rounded-md" />
+              </div>
+            </div>
+            <Block className="mx-auto h-7 w-20 rounded-full" />
+            <Block className="mx-auto h-5 w-28 rounded-md" />
+            <Block className="mx-auto h-7 w-20 rounded-full" />
+            <Block className="ml-auto h-8 w-8 rounded-xl" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 function NoticesSkeleton() {
   return (
     <div className="mx-auto max-w-7xl">
@@ -1442,7 +1519,9 @@ export default function RouteRefreshSkeleton() {
 
   const kind = routeKind(pathname);
   let body;
-  if (kind === 'dashboard') body = <Dashboard intern={role === 'INTERN'} />;
+  if (kind === 'admin') body = <AdminUsersSkeleton />;
+  else if (kind === 'dashboard')
+    body = <Dashboard intern={role === 'INTERN'} />;
   else if (kind === 'team') body = <Team />;
   else if (kind === 'attendance') body = <Attendance />;
   else if (kind === 'ratings') body = <Ratings />;

@@ -218,6 +218,7 @@ const adminNav = [
 const FULL_LOGO_SRC = '/UptoSkills.webp';
 const MINI_LOGO_SRC = '/Uptoskills_log_fevicon.png';
 const COORDINATED_LOADING_ROUTES = new Set([
+  '/admin',
   '/dashboard',
   '/team',
   '/hr',
