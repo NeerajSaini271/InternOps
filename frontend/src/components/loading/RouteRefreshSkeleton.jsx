@@ -778,16 +778,82 @@ function ReportsSkeleton() {
   );
 }
 function TemplatesSkeleton() {
+  const actionWidths = [
+    'w-[82px]', // Preview
+    'w-[96px]', // Generate
+    'w-[64px]', // Edit
+    'w-[84px]', // Versions
+    'w-[116px]', // Save Version
+    'w-[76px]', // Export
+    'w-[76px]', // Delete
+  ];
   return (
     <>
-      <PageHeading action compact />
-      <Card className="mb-5 p-4">
-        <Lines count={3} />
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+          <div>
+            <Block className="h-10 w-[300px] max-w-[65vw] rounded-lg" />
+            <Block className="mt-2 h-5 w-[420px] max-w-[70vw] rounded-md" />
+          </div>
+        </div>
+        <div className="-mt-7 flex gap-2">
+          <Block className="h-[37px] w-[140px] rounded-lg" />
+          <Block className="h-[38px] w-[154px] rounded-lg" />
+        </div>
+      </div>
+
+      <Card className="mb-5 h-[127px] p-4">
+        <div className="flex h-full flex-col justify-center">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <Block className="h-6 w-40 rounded-md" />
+              <Block className="mt-2 h-5 w-[350px] max-w-[70vw] rounded-md" />
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Block className="h-[37px] w-[80px] rounded-lg" />
+            <Block className="h-[37px] w-[86px] rounded-lg" />
+            <Block className="h-[37px] w-[97px] rounded-lg" />
+          </div>
+        </div>
       </Card>
+
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-        {Array.from({ length: 4 }, (_, i) => (
-          <Card key={i} className="min-h-60 p-5">
-            <Lines count={8} />
+        {Array.from({ length: 2 }, (_, cardIndex) => (
+          <Card key={cardIndex} className="h-[261px] p-5">
+            <div className="flex h-full flex-col justify-center">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Block className="h-7 w-36 rounded-md" />
+                    <Block className="h-7 w-19 rounded-full" />
+                  </div>
+                  <Block className="mt-1 h-5 w-36 rounded-md" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <Block className="mb-2 h-4 w-20 rounded-md" />
+                <div className="flex flex-wrap gap-2">
+                  {['w-[92px]', 'w-[112px]', 'w-[72px]', 'w-[68px]'].map(
+                    (width) => (
+                      <Block
+                        key={width}
+                        className={`h-7 ${width} rounded-full`}
+                      />
+                    )
+                  )}
+                </div>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {actionWidths.map((width) => (
+                  <Block
+                    key={width}
+                    className={`h-[36px] ${width} rounded-lg`}
+                  />
+                ))}
+              </div>
+            </div>
           </Card>
         ))}
       </div>

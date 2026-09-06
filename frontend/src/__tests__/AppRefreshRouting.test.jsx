@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+﻿import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -32,7 +32,7 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review', () => {
+  it('centralizes initial loading for Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, and Report Templates', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
@@ -45,6 +45,8 @@ describe('refresh loading and route preservation contract', () => {
       read('src/pages/Sessions.jsx'),
       read('src/pages/InternOps.jsx'),
       read('src/pages/PerformanceIntelligence.jsx'),
+      read('src/pages/admin/Reports.jsx'),
+      read('src/pages/admin/ReportTemplates.jsx'),
     ];
     expect(layout).toContain('COORDINATED_LOADING_ROUTES');
     expect(layout).toContain(
@@ -417,5 +419,19 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).toContain('function PerformanceIntelligenceSkeleton()');
     expect(skeleton).toContain("kind === 'performance-intelligence'");
     expect(skeleton).toContain('md:grid-cols-4');
+  });
+
+  it('coordinates Report Templates loading and exact overview skeleton', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const templates = read('src/pages/admin/ReportTemplates.jsx');
+    expect(layout).toContain("'/report-templates'");
+    expect(templates).toContain('useRouteInitialLoading(');
+    expect(templates).toContain('templatesQuery.isLoading');
+    expect(templates.match(/<Spinner \/>/g)).toHaveLength(1);
+    expect(skeleton).toContain('function TemplatesSkeleton()');
+    expect(skeleton).toContain('h-[37px] w-[140px]');
+    expect(skeleton).toContain('h-[38px] w-[154px]');
+    expect(skeleton).toContain('grid grid-cols-1 gap-5 xl:grid-cols-2');
+    expect(skeleton).toContain('actionWidths.map');
   });
 });
