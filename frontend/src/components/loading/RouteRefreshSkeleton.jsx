@@ -693,20 +693,85 @@ function Generic({ cols = 5 }) {
 function ReportsSkeleton() {
   return (
     <>
-      <PageHeading compact />
-      <Card className="mb-5 flex flex-wrap gap-4 p-4">
-        <Block className="h-12 w-56" />
-        <Block className="h-12 w-56" />
+      <div className="mb-7 flex items-center gap-4">
+        <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+        <div>
+          <Block className="h-10 w-[190px] rounded-lg" />
+          <Block className="mt-2 h-5 w-[360px] max-w-[70vw] rounded-md" />
+        </div>
+      </div>
+
+      <Card className="mb-5 flex flex-wrap items-end gap-4 p-4">
+        {Array.from({ length: 2 }, (_, index) => (
+          <div key={index} className="w-full sm:w-56">
+            <Block className="mb-2 h-4 w-14 rounded-md" />
+            <Block className="h-[51px] w-full rounded-2xl" />
+          </div>
+        ))}
       </Card>
+
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Card className="min-h-72 p-5">
-          <Lines count={7} />
+        <Card className="p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <Block className="h-5 w-5 shrink-0 rounded-md" />
+            <Block className="h-6 w-48 rounded-md" />
+          </div>
+          <div className="space-y-2">
+            {Array.from({ length: 5 }, (_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-700"
+              >
+                <div className="flex items-center gap-3">
+                  <Block className="h-5 w-36 rounded-md" />
+                  <Block className="h-7 w-24 rounded-full" />
+                </div>
+                <Block className="h-5 w-10 rounded-md" />
+              </div>
+            ))}
+          </div>
         </Card>
-        <Card className="min-h-72 p-5">
-          <Lines count={7} />
+
+        <Card className="p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <Block className="h-5 w-5 shrink-0 rounded-md" />
+            <Block className="h-6 w-40 rounded-md" />
+          </div>
+          <div className="space-y-2">
+            {Array.from({ length: 3 }, (_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-700"
+              >
+                <div className="space-y-1">
+                  <Block className="h-5 w-36 rounded-md" />
+                  <Block className="h-4 w-44 rounded-md" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Block className="h-5 w-5 rounded-md" />
+                  <Block className="h-5 w-24 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
         </Card>
-        <Card className="min-h-64 p-5 md:col-span-2">
-          <Lines count={6} />
+
+        <Card className="p-5 md:col-span-2">
+          <div className="mb-3 flex items-center gap-2">
+            <Block className="h-5 w-5 shrink-0 rounded-md" />
+            <Block className="h-6 w-44 rounded-md" />
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }, (_, index) => (
+              <div key={index}>
+                <div className="mb-1 flex justify-between">
+                  <Block className="h-5 w-48 rounded-md" />
+                  <Block className="h-5 w-28 rounded-md" />
+                </div>
+                <Block className="h-2 w-full rounded-full" />
+              </div>
+            ))}
+          </div>
         </Card>
       </div>
     </>

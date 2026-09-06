@@ -227,6 +227,7 @@ const COORDINATED_LOADING_ROUTES = new Set([
   '/sessions',
   '/internops',
   '/performance-intelligence',
+  '/reports',
 ]);
 
 function canShowNavItem(item, role, flags, flagsLoaded) {
