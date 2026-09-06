@@ -32,11 +32,12 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).not.toContain('fixed inset-x-0 top-0 z-[100] h-1');
   });
 
-  it('centralizes initial loading for User Directory, Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, Report Templates, Exports, and Notice Board', () => {
+  it('centralizes initial loading for User Directory, Departments, Dashboard, Team, HR, Profile, Tasks, Notifications, Sessions, and InternOps, plus AI Performance Review, Reports, Report Templates, Exports, and Notice Board', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const coordinator = read('src/components/loading/RouteInitialLoading.jsx');
     const pages = [
       read('src/pages/admin/AdminDashboard.jsx'),
+      read('src/pages/admin/Departments.jsx'),
       read('src/pages/Home.jsx'),
       read('src/pages/Team.jsx'),
       read('src/pages/HR.jsx'),
@@ -454,6 +455,23 @@ describe('refresh loading and route preservation contract', () => {
     expect(skeleton).toContain('min-h-[260px]');
   });
 
+  it('coordinates Departments loading and matches the department-card workspace', () => {
+    const layout = read('src/layouts/DashboardLayout.jsx');
+    const departments = read('src/pages/admin/Departments.jsx');
+    expect(layout).toContain("'/departments'");
+    expect(departments).toContain(
+      'useRouteInitialLoading(isLoading && isAdmin && departments.length === 0)'
+    );
+    expect(departments).not.toContain(') : isLoading ? (');
+    expect(skeleton).toContain('function DepartmentsSkeleton()');
+    expect(skeleton).toContain("kind === 'departments'");
+    expect(skeleton).toContain(
+      'grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3'
+    );
+    expect(skeleton).toContain('Array.from({ length: 3 }');
+    expect(skeleton).toContain('h-[190px]');
+    expect(skeleton).toContain('h-7 w-[144px] rounded-xl');
+  });
   it('coordinates User Directory loading and matches its exact workspace skeleton', () => {
     const layout = read('src/layouts/DashboardLayout.jsx');
     const users = read('src/pages/admin/AdminDashboard.jsx');

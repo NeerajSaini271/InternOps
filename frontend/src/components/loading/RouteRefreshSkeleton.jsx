@@ -948,6 +948,50 @@ function NoticeBlock({ className = '' }) {
     <Block className={`!animate-[pulse_2s_linear_infinite] ${className}`} />
   );
 }
+function DepartmentsSkeleton() {
+  return (
+    <div>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <Block className="h-12 w-12 shrink-0 rounded-2xl" />
+          <div>
+            <Block className="h-10 w-[225px] max-w-[62vw] rounded-lg" />
+            <Block className="mt-2 h-5 w-[350px] max-w-[72vw] rounded-md" />
+          </div>
+        </div>
+        <Block className="h-[38px] w-[144px] -translate-y-[15px] rounded-2xl" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 3 }, (_, index) => (
+          <Card
+            key={index}
+            className="h-[190px] border border-slate-200 p-5 dark:border-slate-700 dark:!bg-slate-800"
+          >
+            <div className="flex h-full flex-col justify-center">
+              <div className="flex items-center gap-4">
+                <Block className="h-11 w-11 shrink-0 rounded-2xl" />
+                <div className="min-w-0 flex-1">
+                  <Block className="h-5 w-[150px] max-w-full rounded-md" />
+                  <Block className="mt-2 h-4 w-[175px] max-w-full rounded-md" />
+                </div>
+                <Block className="h-7 w-7 shrink-0 rounded-xl" />
+              </div>
+              <div className="mt-4 border-t border-slate-700 pt-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Block className="h-7 w-[116px] rounded-xl" />
+                  <Block className="h-7 w-[92px] rounded-xl" />
+                  <Block className="h-7 w-[78px] rounded-xl" />
+                  <Block className="h-7 w-[144px] rounded-xl" />
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 function AdminUsersSkeleton() {
   const columns = '42% 15% 20% 13% 10%';
   return (
@@ -1520,6 +1564,7 @@ export default function RouteRefreshSkeleton() {
   const kind = routeKind(pathname);
   let body;
   if (kind === 'admin') body = <AdminUsersSkeleton />;
+  else if (kind === 'departments') body = <DepartmentsSkeleton />;
   else if (kind === 'dashboard')
     body = <Dashboard intern={role === 'INTERN'} />;
   else if (kind === 'team') body = <Team />;
