@@ -222,6 +222,8 @@ const COORDINATED_LOADING_ROUTES = new Set([
   '/team',
   '/hr',
   '/profile',
+  '/tasks',
+  '/notifications',
 ]);
 
 function canShowNavItem(item, role, flags, flagsLoaded) {
@@ -265,6 +267,17 @@ const NavLink = memo(({ n, active, collapsed, onLinkClick }) => {
   );
 });
 NavLink.displayName = 'NavLink';
+function AccountAvatar({ loading, name, email, src }) {
+  if (loading) {
+    return (
+      <span
+        aria-label="Loading account avatar"
+        className="block h-9 w-9 shrink-0 animate-pulse rounded-full border border-white/30 bg-white/15 dark:border-slate-700 dark:bg-slate-700/70"
+      />
+    );
+  }
+  return <UserAvatar name={name} email={email} src={src} text="text-xs" />;
+}
 
 let authHydrationPromise = null;
 function waitForAuthHydration() {
@@ -293,6 +306,7 @@ export default function DashboardLayout() {
   const [animatedRoutePath, setAnimatedRoutePath] = useState(null);
   const shouldAnimateRoute = animatedRoutePath === loc.pathname;
   const user = useAuthStore((s) => s.user);
+  const hydrated = useAuthStore((s) => s.hydrated);
   const logout = useAuthStore((s) => s.logout);
   const impersonation = useAuthStore((s) => s.impersonation);
   const exitImpersonation = useAuthStore((s) => s.exitImpersonation);
@@ -342,7 +356,7 @@ export default function DashboardLayout() {
   const [endingUserView, setEndingUserView] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const { data: me } = useQuery({
+  const { data: me, isFetched: profileFetched } = useQuery({
     queryKey: QUERY_KEYS.USER_PROFILE,
     queryFn: () => api.get('/users/me').then((r) => r.data),
     enabled: !!accessToken,
@@ -383,10 +397,12 @@ export default function DashboardLayout() {
 
   const displayName = me?.full_name || user?.full_name || user?.fullName || '';
   const displayNameReady = Boolean(displayName);
-  const profileAvatar = me ? me.avatar_url : user?.avatar_url;
-  const avatarUrl = resolveUploadUrl(
-    profileAvatar || (role === 'ADMIN' ? '/admin-default-avatar.svg' : null)
-  );
+  const profileAvatar = profileFetched ? me?.avatar_url : user?.avatar_url;
+  const avatarPending =
+    !profileAvatar && (!hydrated || (!!accessToken && !profileFetched));
+  const defaultAvatar =
+    !avatarPending && role === 'ADMIN' ? '/admin-default-avatar.svg' : null;
+  const avatarUrl = resolveUploadUrl(profileAvatar || defaultAvatar);
 
   useEffect(() => {
     localStorage.setItem('sidebar', collapsed ? 'collapsed' : 'open');
@@ -677,11 +693,11 @@ export default function DashboardLayout() {
           <div
             className={`rounded-3xl border border-white/10 bg-white/10 backdrop-blur-xl flex items-center shadow-lg shadow-indigo-950/20 ${collapsed ? 'justify-center p-2.5' : 'gap-3 p-3'}`}
           >
-            <UserAvatar
+            <AccountAvatar
+              loading={avatarPending}
               name={displayName}
               email={user?.email}
               src={avatarUrl}
-              text="text-xs"
             />
             {!collapsed && (
               <>
@@ -790,11 +806,11 @@ export default function DashboardLayout() {
               onClick={saveSidebarScroll}
               className="rounded-full hover:scale-105 transition"
             >
-              <UserAvatar
+              <AccountAvatar
+                loading={avatarPending}
                 name={displayName}
                 email={user?.email}
                 src={avatarUrl}
-                text="text-xs"
               />
             </Link>
           </div>
