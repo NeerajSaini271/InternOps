@@ -3,8 +3,13 @@
 // underlying behavior (cookie names, token shapes) without having to
 // hunt through a dozen test files.
 
-const SEEDED_ADMIN_EMAIL = 'admin@internops.com';
-const SEEDED_ADMIN_PASSWORD = 'Admin@123';
+const SEEDED_ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL;
+const SEEDED_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
+if (!SEEDED_ADMIN_EMAIL || !SEEDED_ADMIN_PASSWORD) {
+  throw new Error(
+    'SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are required for integration tests'
+  );
+}
 
 // This specific mocked hash format is what argon2 mock produces.
 // Using it directly ensures the password verifies correctly even with mocked argon2.

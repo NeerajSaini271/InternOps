@@ -36,8 +36,6 @@ jobs:
       JWT_REFRESH_EXPIRES_IN: 7d
       PORT: 5000
       CORS_ORIGINS: http://localhost:5173
-      SEED_ADMIN_EMAIL: admin@internops.com
-      SEED_ADMIN_PASSWORD: Admin@123
 
     steps:
       - name: Checkout code
@@ -53,6 +51,11 @@ jobs:
       - name: Install all dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Generate isolated CI administrator credentials
+        shell: bash
+        run: |
+          echo "SEED_ADMIN_EMAIL=admin@internops.com" >> "$GITHUB_ENV"
+          echo "SEED_ADMIN_PASSWORD=$(openssl rand -base64 36 | tr -d '\n')" >> "$GITHUB_ENV"
       - name: Run backend linting
         run: cd backend && npm run lint && npm run lint:db
 

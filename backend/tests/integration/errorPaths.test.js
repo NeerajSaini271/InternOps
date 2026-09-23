@@ -4,7 +4,12 @@ const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
 const pool = require('../../src/config/db');
 const config = require('../../src/config');
-const { parseSetCookie, mergeCookies } = require('./helpers');
+const {
+  SEEDED_ADMIN_EMAIL,
+  SEEDED_ADMIN_PASSWORD,
+  parseSetCookie,
+  mergeCookies,
+} = require('./helpers');
 
 function multipartBody(boundary, filename, content) {
   return Buffer.concat([
@@ -78,7 +83,10 @@ describe('API error-path integration tests', () => {
     const res = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/login',
-      payload: { email: 'admin@internops.com', password: 'Admin@123' },
+      payload: {
+        email: SEEDED_ADMIN_EMAIL,
+        password: SEEDED_ADMIN_PASSWORD,
+      },
     });
 
     const body = JSON.parse(res.body);
